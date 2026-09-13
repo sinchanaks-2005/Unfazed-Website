@@ -1,0 +1,385 @@
+.availability-page {
+  min-height: 100vh;
+  padding: 30px;
+  background: #f7f8fc;
+}
+
+/* Back to Dashboard */
+.back-dashboard-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 25px;
+  padding: 13px 22px;
+  border: 1px solid #e2e0f2;
+  border-radius: 12px;
+  background: white;
+  color: #36527a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(40, 40, 80, 0.06);
+  transition: all 0.2s ease;
+}
+
+.back-dashboard-button:hover {
+  background: #f5f3ff;
+  color: #6e60d5;
+  border-color: #d9d4f5;
+  transform: translateY(-2px);
+}
+
+/* Page Header */
+.availability-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.availability-label {
+  margin: 0 0 6px;
+  color: #7c6ee6;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.availability-header h1 {
+  margin: 0;
+  color: #24243a;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.availability-header p:not(.availability-label) {
+  margin: 8px 0 0;
+  color: #77788c;
+  font-size: 16px;
+}
+
+/* Save Button */
+.save-availability-btn {
+  border: none;
+  padding: 13px 20px;
+  border-radius: 12px;
+  background: #7c6ee6;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(124, 110, 230, 0.25);
+  transition: 0.2s;
+}
+
+.save-availability-btn:hover {
+  background: #6e60d5;
+  transform: translateY(-2px);
+}
+
+/* Main Layout */
+.availability-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* Cards */
+.availability-card,
+.availability-info-card,
+.availability-tip-card {
+  background: white;
+  border: 1px solid #eeeef5;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(40, 40, 80, 0.05);
+}
+
+.availability-card {
+  overflow: hidden;
+}
+
+/* Weekly Schedule Header */
+.availability-card-header {
+  padding: 22px;
+  border-bottom: 1px solid #eeeef5;
+}
+
+.availability-card-header h2 {
+  margin: 0;
+  color: #303047;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.availability-card-header p {
+  margin: 5px 0 0;
+  color: #858599;
+  font-size: 13px;
+}
+
+/* Days */
+.days-list {
+  padding: 0 22px;
+}
+
+/* IMPORTANT: Fixed 3-column layout */
+.day-row {
+  min-height: 82px;
+
+  display: grid;
+
+  /*
+    Column 1 = Day
+    Column 2 = Time
+    Column 3 = Status
+  */
+  grid-template-columns: 160px minmax(300px, 1fr) 120px;
+
+  align-items: center;
+
+  column-gap: 20px;
+
+  border-bottom: 1px solid #f0f0f5;
+}
+
+.day-row:last-child {
+  border-bottom: none;
+}
+
+/* Day + Switch */
+.day-name {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.day-name strong {
+  color: #34344b;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 23px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  background: #d9d9e3;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  transition: 0.25s;
+}
+
+.switch input:checked + .slider {
+  background: #7c6ee6;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(19px);
+}
+
+/* Time Fields */
+.time-fields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-time-fields {
+  min-height: 1px;
+}
+
+/* Time Box */
+.time-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-box label {
+  color: #9292a2;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.time-box input {
+  width: 105px;
+  padding: 9px 10px;
+  border: 1px solid #dedee8;
+  border-radius: 9px;
+  background: #fafaff;
+  color: #44445b;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.time-box input:focus {
+  border-color: #9b91eb;
+  box-shadow: 0 0 0 3px rgba(124, 110, 230, 0.08);
+}
+
+/* "to" */
+.to-text {
+  margin-top: 15px;
+  color: #9999a8;
+  font-size: 12px;
+}
+
+/* Status - ALWAYS LAST COLUMN */
+.available-text,
+.unavailable-text {
+  justify-self: end;
+  text-align: right;
+  font-size: 13px;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.available-text {
+  color: #aaaab7;
+}
+
+.unavailable-text {
+  color: #aaaab7;
+}
+
+/* Right Side */
+.availability-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Info Card */
+.availability-info-card {
+  padding: 25px;
+}
+
+.info-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: #f0edff;
+  font-size: 22px;
+}
+
+.availability-info-card h3 {
+  margin: 0 0 8px;
+  color: #34344b;
+  font-size: 17px;
+}
+
+.availability-info-card p {
+  margin: 0;
+  color: #858599;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Helpful Tip */
+.availability-tip-card {
+  display: flex;
+  gap: 13px;
+  padding: 20px;
+  background: #faf9ff;
+}
+
+.availability-tip-card > span {
+  font-size: 20px;
+}
+
+.availability-tip-card h3 {
+  margin: 0 0 5px;
+  color: #4d4878;
+  font-size: 14px;
+}
+
+.availability-tip-card p {
+  margin: 0;
+  color: #858599;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .availability-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .availability-page {
+    padding: 20px;
+  }
+
+  .back-dashboard-button {
+    margin-bottom: 20px;
+  }
+
+  .availability-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .availability-header h1 {
+    font-size: 30px;
+  }
+
+  .day-row {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 18px 0;
+  }
+
+  .time-fields {
+    width: 100%;
+  }
+
+  .time-box {
+    flex: 1;
+  }
+
+  .time-box input {
+    width: 100%;
+  }
+
+  .available-text,
+  .unavailable-text {
+    justify-self: start;
+    text-align: left;
+  }
+}
