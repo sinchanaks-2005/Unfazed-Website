@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./TherapistPublicProfile.css";
 
 function TherapistPublicProfile() {
   const { slug } = useParams();
+  const navigate = useNavigate();
 
   const [therapist, setTherapist] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -139,7 +140,10 @@ function TherapistPublicProfile() {
               journey towards better emotional well-being.
             </p>
 
-            <button>
+            <button
+              className="book-session-cta"
+              onClick={() => navigate(`/${slug}/book`)}
+            >
               Book a Session
             </button>
           </div>

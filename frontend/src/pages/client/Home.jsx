@@ -3,525 +3,346 @@ import "./Home.css";
 
 function Home() {
   return (
-    <div className="home-page">
+    <div className="unfazed-home">
+      {/* ================= NAVBAR ================= */}
+      <nav className="home-navbar">
+        <Link to="/" className="home-logo">
+          <span className="logo-mark">U</span>
+          <span>UNFAZED</span>
+        </Link>
 
-      {/* NAVBAR */}
-      <header className="home-navbar">
-        <div className="home-logo">
-          <span>UN</span>
-          <div>
-            <h2>UNFAZED</h2>
-            <p>Mind • Support • Growth</p>
-          </div>
-        </div>
-
-        <nav className="home-nav-links">
-          <a href="#home">Home</a>
+        <div className="home-nav-links">
           <a href="#about">About</a>
           <a href="#how-it-works">How It Works</a>
-          <a href="#support">Support</a>
-        </nav>
-
-        <div className="home-nav-actions">
-          <Link
-            to="/therapist/login"
-            className="home-login-button"
-          >
-            Therapist Login
-          </Link>
-
-          <a
-            href="#find-therapist"
-            className="home-primary-button"
-          >
-            Find a Therapist
-          </a>
+          <a href="#services">Services</a>
+          <a href="#therapists">Therapists</a>
         </div>
-      </header>
 
+        <Link to="/therapist/login" className="nav-login">
+          Therapist Login
+        </Link>
+      </nav>
 
-      {/* HERO SECTION */}
-      <section className="home-hero" id="home">
-
+      {/* ================= HERO ================= */}
+      <section className="home-hero">
         <div className="hero-content">
-
-          <span className="hero-label">
-            YOUR WELL-BEING MATTERS
-          </span>
+          <div className="hero-badge">
+            <span>●</span>
+            A calmer way forward
+          </div>
 
           <h1>
-            A calmer mind
+            Your mental health
             <br />
-            starts with
-            <span> the right support.</span>
+            <span>deserves space.</span>
           </h1>
 
           <p>
-            Connect with caring therapists in a safe,
-            welcoming environment designed to help you
-            understand yourself, overcome challenges,
-            and grow with confidence.
+            Connect with trusted therapists, find the right support,
+            and take your next step toward feeling better.
           </p>
 
           <div className="hero-buttons">
+            <Link to="/therapists" className="primary-btn">
+              Find a Therapist →
+            </Link>
 
-            <a
-              href="#find-therapist"
-              className="hero-main-button"
-            >
-              Find Your Therapist →
+            <a href="#how-it-works" className="secondary-btn">
+              How it works
             </a>
-
-            <a
-              href="#how-it-works"
-              className="hero-secondary-button"
-            >
-              Learn How It Works
-            </a>
-
           </div>
 
           <div className="hero-trust">
-
-            <div className="trust-item">
-              <strong>100%</strong>
-              <span>Private & Secure</span>
+            <div className="trust-avatars">
+              <span>✓</span>
+              <span>✓</span>
+              <span>✓</span>
             </div>
 
-            <div className="trust-divider"></div>
-
-            <div className="trust-item">
-              <strong>Professional</strong>
-              <span>Therapist Support</span>
+            <div>
+              <strong>Private. Secure. Personal.</strong>
+              <small>Your journey stays yours.</small>
             </div>
-
-            <div className="trust-divider"></div>
-
-            <div className="trust-item">
-              <strong>Flexible</strong>
-              <span>Online Sessions</span>
-            </div>
-
           </div>
-
         </div>
 
-
-        {/* HERO VISUAL */}
+        {/* Hero visual */}
         <div className="hero-visual">
-
           <div className="hero-circle"></div>
 
-          <div className="hero-card hero-card-main">
+          <div className="hero-card main-card">
+            <div className="card-icon">♡</div>
 
-            <div className="hero-icon">
-              ♡
-            </div>
+            <span>Take a breath.</span>
 
-            <h3>
-              Your journey
-              <br />
-              starts here.
-            </h3>
-
-            <p>
-              Take one step toward
-              feeling better.
-            </p>
-
+            <strong>
+              You don't have to do it alone.
+            </strong>
           </div>
 
-          <div className="floating-card floating-card-top">
-
-            <span className="floating-icon">
-              ✦
-            </span>
+          <div className="floating-card top-card">
+            <span>✦</span>
 
             <div>
-              <strong>
-                A safe space
-              </strong>
-
-              <small>
-                to be yourself
-              </small>
+              <strong>Find your match</strong>
+              <small>Trusted therapists</small>
             </div>
-
           </div>
 
-          <div className="floating-card floating-card-bottom">
-
-            <span className="online-dot"></span>
+          <div className="floating-card bottom-card">
+            <span>✓</span>
 
             <div>
-              <strong>
-                Caring support
-              </strong>
-
-              <small>
-                when you need it
-              </small>
+              <strong>Safe & confidential</strong>
+              <small>Your privacy matters</small>
             </div>
-
           </div>
-
         </div>
-
       </section>
 
-
-      {/* ABOUT SECTION */}
-      <section className="home-about" id="about">
-
-        <div className="section-heading">
-
-          <span>
-            ABOUT UNFAZED
+      {/* ================= INTRO ================= */}
+      <section className="home-intro" id="about">
+        <div>
+          <span className="section-label">
+            WHY UNFAZED
           </span>
 
           <h2>
-            Mental well-being deserves
+            Support that fits
             <br />
-            <em>time, care and understanding.</em>
+            <em>your life.</em>
           </h2>
-
-          <p>
-            Unfazed is designed to make professional
-            mental-health support easier to discover
-            and access. We bring clients and therapists
-            together through a simple and supportive
-            digital experience.
-          </p>
-
         </div>
 
-        <div className="about-cards">
-
-          <div className="about-card">
-            <div className="about-card-icon">
-              ♡
-            </div>
-
-            <h3>
-              Feel Heard
-            </h3>
-
-            <p>
-              Have a space where your thoughts,
-              concerns and experiences can be
-              understood without judgment.
-            </p>
-          </div>
-
-
-          <div className="about-card">
-            <div className="about-card-icon">
-              ✦
-            </div>
-
-            <h3>
-              Find Support
-            </h3>
-
-            <p>
-              Discover therapists based on their
-              areas of expertise and the support
-              you are looking for.
-            </p>
-          </div>
-
-
-          <div className="about-card">
-            <div className="about-card-icon">
-              ◌
-            </div>
-
-            <h3>
-              Grow Forward
-            </h3>
-
-            <p>
-              Work towards healthier coping strategies,
-              personal growth and improved emotional
-              well-being.
-            </p>
-          </div>
-
-        </div>
-
+        <p>
+          Finding support should feel simple. UNFAZED brings
+          therapy, trusted professionals, scheduling and care
+          management together in one calm, private space.
+        </p>
       </section>
 
+      {/* ================= SERVICES ================= */}
+      <section className="services-section" id="services">
+        <div className="section-heading">
+          <span className="section-label">
+            WHAT WE OFFER
+          </span>
 
-      {/* HOW IT WORKS */}
+          <h2>
+            A better way to care for your mind.
+          </h2>
+        </div>
+
+        <div className="service-grid">
+          <div className="service-card">
+            <div className="service-number">01</div>
+
+            <div className="service-icon">◉</div>
+
+            <h3>
+              Find the right therapist
+            </h3>
+
+            <p>
+              Explore therapist profiles, specialties and
+              languages to find someone who feels right for you.
+            </p>
+
+            <Link to="/therapists">
+              Explore therapists →
+            </Link>
+          </div>
+
+          <div className="service-card featured-service">
+            <div className="service-number">02</div>
+
+            <div className="service-icon">◷</div>
+
+            <h3>
+              Simple scheduling
+            </h3>
+
+            <p>
+              View available times and choose a session that
+              works naturally with your schedule.
+            </p>
+
+            <a href="#how-it-works">
+              Learn more →
+            </a>
+          </div>
+
+          <div className="service-card">
+            <div className="service-number">03</div>
+
+            <div className="service-icon">♡</div>
+
+            <h3>
+              A private space
+            </h3>
+
+            <p>
+              Your conversations and care journey belong to you,
+              with privacy at the center of the experience.
+            </p>
+
+            <a href="#about">
+              Our approach →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS ================= */}
       <section
-        className="how-it-works"
+        className="how-section"
         id="how-it-works"
       >
-
-        <div className="section-heading light-heading">
-
-          <span>
+        <div className="how-heading">
+          <span className="section-label">
             HOW IT WORKS
           </span>
 
           <h2>
-            Simple steps.
+            Three steps.
             <br />
-            <em>Meaningful support.</em>
+            One important decision.
           </h2>
-
         </div>
 
-
-        <div className="steps-container">
-
-          <div className="step-card">
-
-            <div className="step-number">
-              01
-            </div>
-
-            <h3>
-              Explore
-            </h3>
-
-            <p>
-              Learn about different areas of
-              mental-health support and discover
-              therapists who may be right for you.
-            </p>
-
-          </div>
-
-
-          <div className="step-line"></div>
-
-
-          <div className="step-card">
-
-            <div className="step-number">
-              02
-            </div>
-
-            <h3>
-              Choose
-            </h3>
-
-            <p>
-              Review therapist profiles, areas
-              of specialization and available
-              information before making your choice.
-            </p>
-
-          </div>
-
-
-          <div className="step-line"></div>
-
-
-          <div className="step-card">
-
-            <div className="step-number">
-              03
-            </div>
-
-            <h3>
-              Connect
-            </h3>
-
-            <p>
-              Take the next step towards your
-              well-being by connecting with the
-              therapist you choose.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* SUPPORT SECTION */}
-      <section
-        className="support-section"
-        id="support"
-      >
-
-        <div className="section-heading">
-
-          <span>
-            AREAS OF SUPPORT
-          </span>
-
-          <h2>
-            Support for different
-            <br />
-            <em>parts of your journey.</em>
-          </h2>
-
-        </div>
-
-
-        <div className="support-grid">
-
-          <div className="support-item">
+        <div className="steps">
+          <div className="step">
             <span>01</span>
-            <h3>Anxiety & Stress</h3>
-            <p>
-              Understand stress and develop
-              healthier ways to manage everyday
-              challenges.
-            </p>
+
+            <div>
+              <h3>Explore</h3>
+
+              <p>
+                Browse therapists and discover the kind of
+                support you need.
+              </p>
+            </div>
           </div>
 
-          <div className="support-item">
+          <div className="step">
             <span>02</span>
-            <h3>Personal Growth</h3>
-            <p>
-              Build self-awareness, confidence
-              and healthier patterns in life.
-            </p>
+
+            <div>
+              <h3>Connect</h3>
+
+              <p>
+                Choose a therapist and find a session time
+                that works for you.
+              </p>
+            </div>
           </div>
 
-          <div className="support-item">
+          <div className="step">
             <span>03</span>
-            <h3>Emotional Well-being</h3>
-            <p>
-              Explore your emotions and develop
-              practical coping strategies.
-            </p>
-          </div>
 
-          <div className="support-item">
-            <span>04</span>
-            <h3>Life Challenges</h3>
-            <p>
-              Receive support while navigating
-              difficult personal situations and
-              transitions.
-            </p>
-          </div>
+            <div>
+              <h3>Begin</h3>
 
+              <p>
+                Take your first step toward a healthier,
+                more balanced you.
+              </p>
+            </div>
+          </div>
         </div>
-
       </section>
 
-
-      {/* FIND THERAPIST CTA */}
+      {/* ================= THERAPIST CTA ================= */}
       <section
-        className="home-cta"
-        id="find-therapist"
+        className="therapist-section"
+        id="therapists"
       >
-
-        <div className="cta-content">
-
-          <span>
-            TAKE THE FIRST STEP
+        <div className="therapist-content">
+          <span className="section-label">
+            YOUR NEXT STEP
           </span>
 
           <h2>
-            You don't have to
+            You don't need
             <br />
-            figure everything out alone.
+            to have it all figured out.
           </h2>
 
           <p>
-            When you're ready, we're here to
-            help you find the right support.
+            Start with one conversation. Find a therapist
+            who understands what you're going through.
           </p>
 
-          <button className="cta-button">
-            Find a Therapist →
-          </button>
-
+          <Link
+            to="/therapists"
+            className="light-btn"
+          >
+            Find your therapist →
+          </Link>
         </div>
 
+        <div className="therapist-decoration">
+          <div className="leaf leaf-one"></div>
+          <div className="leaf leaf-two"></div>
+          <div className="leaf leaf-three"></div>
+        </div>
       </section>
 
-
-      {/* FOOTER */}
+      {/* ================= FOOTER ================= */}
       <footer className="home-footer">
-
         <div className="footer-brand">
-
-          <h2>
-            UNFAZED
-          </h2>
+          <Link to="/" className="home-logo">
+            <span className="logo-mark">U</span>
+            <span>UNFAZED</span>
+          </Link>
 
           <p>
-            Mind • Support • Growth
+            A calmer way to find the support you need.
           </p>
-
-          <span>
-            A platform designed to make
-            mental-health support more accessible.
-          </span>
-
         </div>
-
 
         <div className="footer-links">
-
           <div>
-            <h4>
-              Platform
-            </h4>
+            <strong>Explore</strong>
 
-            <a href="#home">Home</a>
             <a href="#about">About</a>
+
+            <a href="#services">Services</a>
+
             <a href="#how-it-works">
               How It Works
             </a>
           </div>
 
-
           <div>
-            <h4>
-              Support
-            </h4>
-
-            <a href="#support">
-              Areas of Support
-            </a>
-
-            <a href="#find-therapist">
-              Find a Therapist
-            </a>
-          </div>
-
-
-          <div>
-            <h4>
-              Therapists
-            </h4>
+            <strong>For Therapists</strong>
 
             <Link to="/therapist/login">
-              Therapist Login
+              Login
             </Link>
 
             <Link to="/therapist/signup">
-              Join as Therapist
+              Join UNFAZED
             </Link>
           </div>
 
-        </div>
+          <div>
+            <strong>Support</strong>
 
+            <a href="#about">Privacy</a>
+
+            <a href="#about">Contact</a>
+          </div>
+        </div>
 
         <div className="footer-bottom">
+          <span>© 2026 UNFAZED</span>
 
           <span>
-            © 2026 Unfazed. All rights reserved.
+            Made for better mental wellbeing.
           </span>
-
-          <span>
-            Built for better mental well-being.
-          </span>
-
         </div>
-
       </footer>
-
     </div>
   );
 }

@@ -44,6 +44,40 @@ const therapistSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+
+    subscriptionTier: {
+      type: String,
+      default: "starter",
+      lowercase: true,
+      trim: true,
+    },
+
+    // New fields for multi-provider directory
+    profileImage: {
+      type: String,
+      default: "",
+    },
+
+    experience: {
+      type: Number,
+      default: 0,
+    },
+
+    qualification: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    consultationFee: {
+      type: Number,
+      default: 0,
+    },
+
+    isDemo: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

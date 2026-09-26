@@ -10,6 +10,7 @@ import Availability from "./pages/therapist/Availability";
 import Settings from "./pages/therapist/Settings";
 
 import TherapistPublicProfile from "./pages/client/TherapistPublicProfile";
+import BookingPage from "./pages/client/BookingPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -23,7 +24,7 @@ function App() {
         element={<Navigate to="/therapist/login" replace />}
       />
 
-      {/* Public Therapist Pages */}
+      {/* Public Therapist Auth */}
       <Route
         path="/therapist/login"
         element={<Login />}
@@ -34,9 +35,24 @@ function App() {
         element={<Signup />}
       />
 
-      {/* Public Branded Therapist Profile */}
+      {/* Public Branded Therapist Profile & Booking Routes */}
       <Route
         path="/therapist/:slug"
+        element={<TherapistPublicProfile />}
+      />
+
+      <Route
+        path="/therapist/:slug/book"
+        element={<BookingPage />}
+      />
+
+      <Route
+        path="/:slug/book"
+        element={<BookingPage />}
+      />
+
+      <Route
+        path="/:slug"
         element={<TherapistPublicProfile />}
       />
 

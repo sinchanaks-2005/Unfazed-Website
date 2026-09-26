@@ -6,6 +6,7 @@ const {
   getTherapistProfile,
   updateTherapistProfile,
   getPublicTherapistBySlug,
+  getPublicTherapists,
 } = require("../controllers/therapistController");
 
 const protect = require("../middleware/authMiddleware");
@@ -31,10 +32,19 @@ router.get("/profile", protect, getTherapistProfile);
 router.put("/profile", protect, updateTherapistProfile);
 
 // ==========================================
+// PUBLIC THERAPIST DIRECTORY
+// ==========================================
+
+// Example:
+// GET /api/therapists/public?specialization=CBT&search=anxiety
+router.get("/public", getPublicTherapists);
+
+// ==========================================
 // PUBLIC BRANDED THERAPIST PROFILE
 // ==========================================
 
-// Get therapist profile using branded slug
+// Example:
+// GET /api/therapists/public/dr-priya
 router.get("/public/:slug", getPublicTherapistBySlug);
 
 module.exports = router;

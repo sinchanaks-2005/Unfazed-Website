@@ -3,6 +3,29 @@ const jwt = require("jsonwebtoken");
 const Therapist = require("../models/Therapist");
 
 // ==========================================
+// CREATE UNIQUE SLUG
+// ==========================================
+
+const createUniqueSlug = async (name) => {
+  const baseSlug =
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "therapist";
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await Therapist.exists({ slug })) {
+    slug = `${baseSlug}-${counter}`;
+    counter += 1;
+  }
+
+  return slug;
+};
+
+// ==========================================
 // THERAPIST SIGNUP
 // ==========================================
 
@@ -16,8 +39,10 @@ const signupTherapist = async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const existingTherapist = await Therapist.findOne({
-      email: email.toLowerCase(),
+      email: normalizedEmail,
     });
 
     if (existingTherapist) {
@@ -28,20 +53,16 @@ const signupTherapist = async (req, res) => {
 
     const password_hash = await bcrypt.hash(password, 10);
 
-    const slug = name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+    const slug = await createUniqueSlug(name);
 
     const therapist = await Therapist.create({
-      name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: normalizedEmail,
       password_hash,
       slug,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Therapist account created successfully",
 
       therapist: {
@@ -54,7 +75,7 @@ const signupTherapist = async (req, res) => {
   } catch (error) {
     console.error("Signup error:", error.message);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error during signup",
     });
   }
@@ -74,8 +95,10 @@ const loginTherapist = async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const therapist = await Therapist.findOne({
-      email: email.toLowerCase(),
+      email: normalizedEmail,
     });
 
     if (!therapist) {
@@ -97,7 +120,7 @@ const loginTherapist = async (req, res) => {
 
     const token = jwt.sign(
       {
-        therapistId: therapist._id,
+        therapistId: therapist._id.toString(),
       },
       process.env.JWT_SECRET,
       {
@@ -105,7 +128,7 @@ const loginTherapist = async (req, res) => {
       }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
 
       token,
@@ -118,12 +141,16 @@ const loginTherapist = async (req, res) => {
         bio: therapist.bio,
         specializations: therapist.specializations,
         languages: therapist.languages,
+        profileImage: therapist.profileImage,
+        experience: therapist.experience,
+        qualification: therapist.qualification,
+        consultationFee: therapist.consultationFee,
       },
     });
   } catch (error) {
     console.error("Login error:", error.message);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error during login",
     });
   }
@@ -135,8 +162,14 @@ const loginTherapist = async (req, res) => {
 
 const getTherapistProfile = async (req, res) => {
   try {
+    if (!req.therapist) {
+      return res.status(401).json({
+        message: "Authentication required",
+      });
+    }
+
     const therapist = await Therapist.findById(
-      req.therapistId
+      req.therapist._id
     ).select("-password_hash");
 
     if (!therapist) {
@@ -145,7 +178,7 @@ const getTherapistProfile = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       therapist,
     });
   } catch (error) {
@@ -154,7 +187,7 @@ const getTherapistProfile = async (req, res) => {
       error.message
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error while fetching profile",
     });
   }
@@ -166,21 +199,31 @@ const getTherapistProfile = async (req, res) => {
 
 const updateTherapistProfile = async (req, res) => {
   try {
+    if (!req.therapist) {
+      return res.status(401).json({
+        message: "Authentication required",
+      });
+    }
+
     const {
       name,
       bio,
       specializations,
       languages,
+      profileImage,
+      experience,
+      qualification,
+      consultationFee,
     } = req.body;
 
-    if (!name) {
+    if (!name || !name.trim()) {
       return res.status(400).json({
         message: "Name is required",
       });
     }
 
     const therapist = await Therapist.findById(
-      req.therapistId
+      req.therapist._id
     );
 
     if (!therapist) {
@@ -191,21 +234,44 @@ const updateTherapistProfile = async (req, res) => {
 
     therapist.name = name.trim();
 
-    therapist.bio = bio || "";
+    if (bio !== undefined) {
+      therapist.bio = bio.trim();
+    }
 
-    therapist.specializations =
-      Array.isArray(specializations)
+    if (specializations !== undefined) {
+      therapist.specializations = Array.isArray(
+        specializations
+      )
         ? specializations
         : [];
+    }
 
-    therapist.languages =
-      Array.isArray(languages)
+    if (languages !== undefined) {
+      therapist.languages = Array.isArray(languages)
         ? languages
         : [];
+    }
+
+    if (profileImage !== undefined) {
+      therapist.profileImage = profileImage;
+    }
+
+    if (experience !== undefined) {
+      therapist.experience = Number(experience) || 0;
+    }
+
+    if (qualification !== undefined) {
+      therapist.qualification = qualification;
+    }
+
+    if (consultationFee !== undefined) {
+      therapist.consultationFee =
+        Number(consultationFee) || 0;
+    }
 
     await therapist.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Profile updated successfully",
 
       therapist: {
@@ -216,6 +282,10 @@ const updateTherapistProfile = async (req, res) => {
         bio: therapist.bio,
         specializations: therapist.specializations,
         languages: therapist.languages,
+        profileImage: therapist.profileImage,
+        experience: therapist.experience,
+        qualification: therapist.qualification,
+        consultationFee: therapist.consultationFee,
       },
     });
   } catch (error) {
@@ -224,7 +294,7 @@ const updateTherapistProfile = async (req, res) => {
       error.message
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error while updating profile",
     });
   }
@@ -246,9 +316,8 @@ const getPublicTherapistBySlug = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Therapist profile found",
-
       therapist,
     });
   } catch (error) {
@@ -257,8 +326,78 @@ const getPublicTherapistBySlug = async (req, res) => {
       error.message
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error",
+    });
+  }
+};
+
+// ==========================================
+// GET PUBLIC THERAPIST DIRECTORY
+// GET /api/therapists/public
+// Optional:
+// ?specialization=Dermatologist
+// ?search=keyword
+// ==========================================
+
+const getPublicTherapists = async (req, res) => {
+  try {
+    const filter = {};
+    const { specialization, search } = req.query;
+
+    if (specialization && specialization.trim()) {
+      filter.specializations = {
+        $in: [
+          new RegExp(
+            specialization.trim(),
+            "i"
+          ),
+        ],
+      };
+    }
+
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(
+        search.trim(),
+        "i"
+      );
+
+      filter.$or = [
+        {
+          name: searchRegex,
+        },
+        {
+          specializations: {
+            $in: [searchRegex],
+          },
+        },
+        {
+          bio: searchRegex,
+        },
+      ];
+    }
+
+    const therapists = await Therapist.find(filter)
+      .select(
+        "_id name slug bio specializations languages profileImage experience qualification consultationFee"
+      )
+      .sort({
+        createdAt: 1,
+      });
+
+    return res.status(200).json({
+      therapists,
+      total: therapists.length,
+    });
+  } catch (error) {
+    console.error(
+      "Public therapist directory error:",
+      error.message
+    );
+
+    return res.status(500).json({
+      message:
+        "Server error while fetching therapists",
     });
   }
 };
@@ -273,4 +412,5 @@ module.exports = {
   getTherapistProfile,
   updateTherapistProfile,
   getPublicTherapistBySlug,
+  getPublicTherapists,
 };

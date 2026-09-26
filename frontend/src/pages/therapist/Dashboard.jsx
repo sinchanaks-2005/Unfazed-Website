@@ -1,5 +1,9 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Dashboard.css";
+
+const API = "http://localhost:5000/api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -7,7 +11,86 @@ function Dashboard() {
   const therapist =
     JSON.parse(localStorage.getItem("therapist")) || {
       name: "Therapist",
+      slug: "",
     };
+
+  const token = localStorage.getItem("token");
+
+  const [stats, setStats] = useState({
+    totalClients: null,
+    upcomingSessions: null,
+    completedSessions: null,
+  });
+
+  const [recentSessions, setRecentSessions] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setStatsLoading(true);
+
+      if (!token) {
+        return;
+      }
+
+      const sessionsRes = await axios.get(
+        `${API}/scheduling/sessions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const allSessions = sessionsRes.data.sessions || [];
+      const now = new Date();
+
+      const upcoming = allSessions.filter(
+        (session) =>
+          new Date(session.endTime) > now &&
+          session.status !== "cancelled"
+      );
+
+      const completed = allSessions.filter(
+        (session) =>
+          new Date(session.endTime) <= now ||
+          session.status === "completed"
+      );
+
+      const uniqueEmails = new Set(
+        allSessions
+          .map((session) => session.clientEmail)
+          .filter(Boolean)
+      );
+
+      setStats({
+        totalClients: uniqueEmails.size,
+        upcomingSessions: upcoming.length,
+        completedSessions: completed.length,
+      });
+
+      setRecentSessions(upcoming.slice(0, 3));
+    } catch (error) {
+      console.error(
+        "Dashboard stats error:",
+        error.response?.data?.message || error.message
+      );
+
+      setStats({
+        totalClients: null,
+        upcomingSessions: null,
+        completedSessions: null,
+      });
+
+      setRecentSessions([]);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -25,12 +108,47 @@ function Dashboard() {
     }
   };
 
+  const formatTime = (iso) => {
+    if (!iso) return "—";
+
+    return new Date(iso).toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  const formatRelativeDate = (iso) => {
+    if (!iso) return "—";
+
+    const date = new Date(iso);
+
+    const today = new Date();
+    const tomorrow = new Date();
+
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    }
+
+    if (date.toDateString() === tomorrow.toDateString()) {
+      return "Tomorrow";
+    }
+
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const statVal = (value) =>
+    statsLoading ? "—" : value ?? "0";
+
   return (
     <div className="dashboard-page">
-
       {/* Sidebar */}
       <aside className="dashboard-sidebar">
-
         <div className="dashboard-logo">
           <span>U</span>
 
@@ -41,64 +159,67 @@ function Dashboard() {
         </div>
 
         <nav className="dashboard-nav">
-
-          {/* Dashboard */}
           <button
             className="nav-item active"
-            onClick={() => navigate("/therapist/dashboard")}
+            onClick={() =>
+              navigate("/therapist/dashboard")
+            }
           >
             <span>⌂</span>
             Dashboard
           </button>
 
-          {/* Profile */}
           <button
             className="nav-item"
-            onClick={() => navigate("/therapist/profile")}
+            onClick={() =>
+              navigate("/therapist/profile")
+            }
           >
             <span>◉</span>
             My Profile
           </button>
 
-          {/* Sessions */}
           <button
             className="nav-item"
-            onClick={() => navigate("/therapist/sessions")}
+            onClick={() =>
+              navigate("/therapist/sessions")
+            }
           >
             <span>▣</span>
             Sessions
           </button>
 
-          {/* Clients */}
           <button
             className="nav-item"
-            onClick={() => navigate("/therapist/clients")}
+            onClick={() =>
+              navigate("/therapist/clients")
+            }
           >
             <span>♙</span>
             Clients
           </button>
 
-          {/* Availability */}
           <button
             className="nav-item"
-            onClick={() => navigate("/therapist/availability")}
+            onClick={() =>
+              navigate("/therapist/availability")
+            }
           >
             <span>◷</span>
             Availability
           </button>
 
-          {/* Settings */}
           <button
             className="nav-item"
-            onClick={() => navigate("/therapist/settings")}
+            onClick={() =>
+              navigate("/therapist/settings")
+            }
           >
             <span>⚙</span>
             Settings
           </button>
-
         </nav>
 
-        {/* Logout */}
         <button
           className="logout-button"
           onClick={handleLogout}
@@ -106,15 +227,12 @@ function Dashboard() {
           <span>↪</span>
           Logout
         </button>
-
       </aside>
 
       {/* Main Content */}
       <main className="dashboard-main">
-
         {/* Header */}
         <header className="dashboard-header">
-
           <div>
             <p className="welcome-small">
               THERAPIST DASHBOARD
@@ -122,102 +240,105 @@ function Dashboard() {
 
             <h1>
               Good morning,{" "}
-              {therapist.name.split(" ")[0]} 👋
+              {therapist.name?.split(" ")[0] ||
+                "Therapist"}{" "}
+              👋
             </h1>
 
             <p className="header-subtitle">
-              Here's a quick overview of your practice today.
+              Here's a quick overview of your practice
+              today.
             </p>
           </div>
 
           <div className="profile-mini">
-
             <div className="profile-avatar">
-              {therapist.name.charAt(0).toUpperCase()}
+              {therapist.name
+                ?.charAt(0)
+                .toUpperCase() || "T"}
             </div>
 
             <div>
-              <strong>{therapist.name}</strong>
+              <strong>
+                {therapist.name || "Therapist"}
+              </strong>
               <span>Therapist</span>
             </div>
-
           </div>
-
         </header>
 
         {/* Statistics */}
         <section className="stats-grid">
-
           <div className="stat-card">
-            <div className="stat-icon">
-              ♙
-            </div>
+            <div className="stat-icon">♙</div>
 
             <div>
               <p>Total Clients</p>
-              <h2>12</h2>
+              <h2>
+                {statVal(stats.totalClients)}
+              </h2>
 
               <span className="stat-positive">
-                +8% this month
+                Unique bookers
               </span>
             </div>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">
-              ▣
-            </div>
-
-            <div>
-              <p>Total Sessions</p>
-              <h2>24</h2>
-
-              <span className="stat-positive">
-                +12% this month
-              </span>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              ◷
-            </div>
+            <div className="stat-icon">▣</div>
 
             <div>
               <p>Upcoming Sessions</p>
-              <h2>4</h2>
+
+              <h2>
+                {statVal(stats.upcomingSessions)}
+              </h2>
 
               <span>
-                Next 7 days
+                Scheduled ahead
               </span>
             </div>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">
-              ★
-            </div>
+            <div className="stat-icon">◷</div>
 
             <div>
-              <p>Profile Rating</p>
-              <h2>4.9</h2>
+              <p>Completed Sessions</p>
+
+              <h2>
+                {statVal(stats.completedSessions)}
+              </h2>
 
               <span>
-                Based on client feedback
+                Sessions done
               </span>
             </div>
           </div>
 
+          <div className="stat-card">
+            <div className="stat-icon">★</div>
+
+            <div>
+              <p>Total Sessions</p>
+
+              <h2>
+                {statsLoading
+                  ? "—"
+                  : (stats.upcomingSessions ?? 0) +
+                    (stats.completedSessions ?? 0)}
+              </h2>
+
+              <span>All time</span>
+            </div>
+          </div>
         </section>
 
-        {/* Content */}
+        {/* Dashboard Content */}
         <section className="dashboard-content">
-
           {/* Upcoming Sessions */}
           <div className="dashboard-card sessions-card">
-
             <div className="card-heading">
-
               <div>
                 <h2>Upcoming Sessions</h2>
 
@@ -228,121 +349,132 @@ function Dashboard() {
 
               <button
                 className="view-button"
-                onClick={() => navigate("/therapist/sessions")}
+                onClick={() =>
+                  navigate("/therapist/sessions")
+                }
               >
                 View all
               </button>
-
             </div>
 
             <div className="session-list">
-
-              <div className="session-item">
-
-                <div className="client-avatar">
-                  A
+              {statsLoading ? (
+                <div
+                  style={{
+                    padding: "20px",
+                    color: "#888",
+                    textAlign: "center",
+                  }}
+                >
+                  Loading sessions...
                 </div>
+              ) : recentSessions.length === 0 ? (
+                <div
+                  style={{
+                    padding: "20px",
+                    color: "#888",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "24px",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    📅
+                  </div>
 
-                <div className="session-info">
-                  <strong>Client A</strong>
-                  <span>Individual Therapy</span>
+                  <p>
+                    No upcoming sessions yet.
+                  </p>
+
+                  <small>
+                    Sessions will appear here once
+                    clients book appointments.
+                  </small>
                 </div>
+              ) : (
+                recentSessions.map((session) => (
+                  <div
+                    className="session-item"
+                    key={session._id}
+                  >
+                    <div className="client-avatar">
+                      {(session.clientName || "?")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
 
-                <div className="session-time">
-                  <strong>10:00 AM</strong>
-                  <span>Today</span>
-                </div>
+                    <div className="session-info">
+                      <strong>
+                        {session.clientName ||
+                          "Unknown"}
+                      </strong>
 
-                <span className="session-status">
-                  Upcoming
-                </span>
+                      <span>
+                        {session.clientEmail || "—"}
+                      </span>
+                    </div>
 
-              </div>
+                    <div className="session-time">
+                      <strong>
+                        {formatTime(
+                          session.startTime
+                        )}
+                      </strong>
 
-              <div className="session-item">
+                      <span>
+                        {formatRelativeDate(
+                          session.startTime
+                        )}
+                      </span>
+                    </div>
 
-                <div className="client-avatar">
-                  R
-                </div>
-
-                <div className="session-info">
-                  <strong>Client R</strong>
-                  <span>Stress Management</span>
-                </div>
-
-                <div className="session-time">
-                  <strong>2:30 PM</strong>
-                  <span>Today</span>
-                </div>
-
-                <span className="session-status">
-                  Upcoming
-                </span>
-
-              </div>
-
-              <div className="session-item">
-
-                <div className="client-avatar">
-                  S
-                </div>
-
-                <div className="session-info">
-                  <strong>Client S</strong>
-                  <span>Anxiety Support</span>
-                </div>
-
-                <div className="session-time">
-                  <strong>11:00 AM</strong>
-                  <span>Tomorrow</span>
-                </div>
-
-                <span className="session-status">
-                  Upcoming
-                </span>
-
-              </div>
-
+                    <span className="session-status">
+                      Upcoming
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
-
           </div>
 
           {/* Profile Card */}
           <div className="dashboard-card profile-card">
-
             <div className="profile-card-top">
-
               <div className="large-avatar">
-                {therapist.name.charAt(0).toUpperCase()}
+                {therapist.name
+                  ?.charAt(0)
+                  .toUpperCase() || "T"}
               </div>
 
               <div>
-                <h2>{therapist.name}</h2>
+                <h2>
+                  {therapist.name || "Therapist"}
+                </h2>
+
                 <p>Therapist</p>
               </div>
-
             </div>
 
             <div className="profile-divider"></div>
 
             <div className="profile-detail">
-
-              <span>
-                Public Profile
-              </span>
+              <span>Public Profile</span>
 
               <strong>
                 unfazed.com/therapist/
                 {therapist.slug || "your-profile"}
               </strong>
-
             </div>
 
             <div className="profile-actions">
-
               <button
                 className="profile-button"
-                onClick={() => navigate("/therapist/profile")}
+                onClick={() =>
+                  navigate("/therapist/profile")
+                }
               >
                 Manage Profile
               </button>
@@ -353,41 +485,31 @@ function Dashboard() {
               >
                 View Public Profile
               </button>
-
             </div>
-
           </div>
-
         </section>
 
         {/* Banner */}
         <section className="dashboard-banner">
-
           <div>
-
-            <p>
-              YOUR PRACTICE, YOUR SPACE
-            </p>
+            <p>YOUR PRACTICE, YOUR SPACE</p>
 
             <h2>
-              Make every client interaction meaningful.
+              Make every client interaction
+              meaningful.
             </h2>
 
             <span>
-              Manage your profile, sessions and clients
-              from one place.
+              Manage your profile, sessions and
+              clients from one place.
             </span>
-
           </div>
 
           <div className="banner-symbol">
             ✦
           </div>
-
         </section>
-
       </main>
-
     </div>
   );
 }
