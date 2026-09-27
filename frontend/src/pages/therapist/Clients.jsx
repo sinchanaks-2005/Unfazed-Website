@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
 import axiosInstance from "../../api/axiosInstance";
 import { useEntitlement } from "../../hooks/useEntitlement";
 import UpgradeModal from "../../components/common/UpgradeModal";
-
 import "./Clients.css";
 
 function Clients() {
@@ -21,13 +19,12 @@ function Clients() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [sortOption, setSortOption] = useState("createdAt:desc");
 
-  // Drawer state
   const [selectedClient, setSelectedClient] = useState(null);
   const [drawerLoading, setDrawerLoading] = useState(false);
   const [clientDetails, setClientDetails] = useState(null);
 
-  // Add client modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [newName, setNewName] = useState("");
@@ -39,7 +36,6 @@ function Clients() {
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // Edit client modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editError, setEditError] = useState("");
@@ -59,10 +55,6 @@ function Clients() {
   const [editStatus, setEditStatus] = useState("Active");
   const [editTags, setEditTags] = useState("");
 
-  // ==========================================
-  // LOAD CLIENTS
-  // ==========================================
-
   const loadClients = useCallback(async () => {
     try {
       setLoading(true);
@@ -72,6 +64,8 @@ function Clients() {
           search: search || undefined,
           status:
             statusFilter !== "All" ? statusFilter : undefined,
+          sortBy: sortOption.split(":")[0],
+          order: sortOption.split(":")[1],
         },
       });
 
@@ -81,15 +75,11 @@ function Clients() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter]);
+  }, [search, statusFilter, sortOption]);
 
   useEffect(() => {
     loadClients();
   }, [loadClients]);
-
-  // ==========================================
-  // OPEN CLIENT PROFILE
-  // ==========================================
 
   const handleViewClient = async (client) => {
     try {
@@ -110,10 +100,6 @@ function Clients() {
       setDrawerLoading(false);
     }
   };
-
-  // ==========================================
-  // ADD CLIENT
-  // ==========================================
 
   const handleOpenAddClient = () => {
     if (!canAccess("canAddClient")) {
@@ -181,10 +167,6 @@ function Clients() {
     }
   };
 
-  // ==========================================
-  // OPEN EDIT CLIENT
-  // ==========================================
-
   const handleOpenEditClient = () => {
     const client = clientDetails?.client;
 
@@ -224,10 +206,6 @@ function Clients() {
 
     setIsEditModalOpen(true);
   };
-
-  // ==========================================
-  // UPDATE EXISTING CLIENT
-  // ==========================================
 
   const handleUpdateClient = async (e) => {
     e.preventDefault();
@@ -287,33 +265,23 @@ function Clients() {
           name: editName.trim(),
           email: editEmail.trim().toLowerCase(),
           phone: editPhone.trim(),
-
           demographics,
-
-          presentingConcern:
-            editConcern.trim(),
-
-          history:
-            editHistory.trim(),
-
+          presentingConcern: editConcern.trim(),
+          history: editHistory.trim(),
           status: editStatus,
-
           tags,
         }
       );
 
-      // Update drawer data immediately
       setClientDetails((previous) => ({
         ...previous,
         client: res.data.client,
       }));
 
-      // Update selected client header
       setSelectedClient(res.data.client);
 
       setIsEditModalOpen(false);
 
-      // Refresh client table
       await loadClients();
     } catch (err) {
       setEditError(
@@ -325,10 +293,6 @@ function Clients() {
     }
   };
 
-  // ==========================================
-  // COUNTERS
-  // ==========================================
-
   const totalSessionsCount = clients.reduce(
     (total, client) =>
       total + (client.totalSessions || 0),
@@ -339,15 +303,8 @@ function Clients() {
     (client) => client.status === "Active"
   ).length;
 
-  // ==========================================
-  // RENDER
-  // ==========================================
-
   return (
     <div className="clients-page">
-
-      {/* BACK TO DASHBOARD */}
-
       <button
         className="back-dashboard-button"
         onClick={() =>
@@ -356,8 +313,6 @@ function Clients() {
       >
         ← Back to Dashboard
       </button>
-
-      {/* HEADER */}
 
       <div className="clients-header">
         <div>
@@ -381,10 +336,7 @@ function Clients() {
         </button>
       </div>
 
-      {/* STATS */}
-
       <div className="client-stats">
-
         <div className="client-stat-card">
           <div className="stat-icon">♙</div>
 
@@ -411,15 +363,10 @@ function Clients() {
             <p>Total Sessions</p>
           </div>
         </div>
-
       </div>
 
-      {/* CLIENT LIST */}
-
       <div className="clients-card">
-
         <div className="clients-card-header">
-
           <div>
             <h2>Client List</h2>
 
@@ -429,7 +376,6 @@ function Clients() {
           </div>
 
           <div className="clients-controls-bar">
-
             <select
               className="status-filter-select"
               value={statusFilter}
@@ -454,6 +400,39 @@ function Clients() {
               </option>
             </select>
 
+            <select
+              className="status-filter-select"
+              value={sortOption}
+              onChange={(e) =>
+                setSortOption(e.target.value)
+              }
+              aria-label="Sort clients"
+            >
+              <option value="createdAt:desc">
+                Newest First
+              </option>
+
+              <option value="updatedAt:desc">
+                Recently Updated
+              </option>
+
+              <option value="name:asc">
+                Name A–Z
+              </option>
+
+              <option value="name:desc">
+                Name Z–A
+              </option>
+
+              <option value="email:asc">
+                Email A–Z
+              </option>
+
+              <option value="lastSession:desc">
+                Recent Session
+              </option>
+            </select>
+
             <div className="client-search">
               <span>⌕</span>
 
@@ -466,19 +445,16 @@ function Clients() {
                 }
               />
             </div>
-
           </div>
         </div>
 
         <div className="clients-table-wrapper">
-
           {loading ? (
             <div className="clients-loading">
               Loading clients from practice database...
             </div>
           ) : (
             <table className="clients-table">
-
               <thead>
                 <tr>
                   <th>CLIENT</th>
@@ -491,15 +467,11 @@ function Clients() {
               </thead>
 
               <tbody>
-
                 {clients.length > 0 ? (
                   clients.map((client) => (
-
                     <tr key={client._id}>
-
                       <td>
                         <div className="client-name">
-
                           <div className="client-avatar">
                             {client.name
                               .charAt(0)
@@ -516,7 +488,6 @@ function Clients() {
                                 "General"}
                             </div>
                           </div>
-
                         </div>
                       </td>
 
@@ -558,14 +529,11 @@ function Clients() {
                           View Profile
                         </button>
                       </td>
-
                     </tr>
-
                   ))
                 ) : (
                   <tr>
                     <td colSpan="6">
-
                       <div className="no-clients">
                         <div>🔍</div>
 
@@ -579,30 +547,19 @@ function Clients() {
                             : "Click '+ Add Client' to add your first client."}
                         </p>
                       </div>
-
                     </td>
                   </tr>
                 )}
-
               </tbody>
             </table>
           )}
-
         </div>
       </div>
 
-      {/* ==========================================
-          ADD CLIENT MODAL
-      ========================================== */}
-
       {isAddModalOpen && (
-
         <div className="modal-backdrop">
-
           <div className="client-modal-card">
-
             <div className="modal-header">
-
               <div>
                 <span className="modal-label">
                   NEW PRACTICE RECORD
@@ -620,7 +577,6 @@ function Clients() {
               >
                 ✕
               </button>
-
             </div>
 
             {formError && (
@@ -633,7 +589,6 @@ function Clients() {
               onSubmit={handleCreateClient}
               className="modal-form"
             >
-
               <div className="form-group">
                 <label>Full Name *</label>
 
@@ -724,7 +679,6 @@ function Clients() {
               </div>
 
               <div className="modal-actions">
-
                 <button
                   type="button"
                   className="modal-cancel-btn"
@@ -745,39 +699,26 @@ function Clients() {
                     ? "Creating..."
                     : "Create Client Record"}
                 </button>
-
               </div>
-
             </form>
-
           </div>
         </div>
       )}
 
-      {/* ==========================================
-          CLIENT PROFILE DRAWER
-      ========================================== */}
-
       {selectedClient && (
-
         <div
           className="modal-backdrop"
           onClick={() =>
             setSelectedClient(null)
           }
         >
-
           <div
             className="client-drawer-card"
             onClick={(e) =>
               e.stopPropagation()
             }
           >
-
-            {/* DRAWER HEADER */}
-
             <div className="drawer-header">
-
               <div className="client-drawer-avatar">
                 {selectedClient.name
                   .charAt(0)
@@ -785,7 +726,6 @@ function Clients() {
               </div>
 
               <div className="drawer-title">
-
                 <h2>
                   {selectedClient.name}
                 </h2>
@@ -795,7 +735,6 @@ function Clients() {
                   {selectedClient.phone ||
                     "No phone"}
                 </p>
-
               </div>
 
               <button
@@ -807,23 +746,15 @@ function Clients() {
               >
                 ✕
               </button>
-
             </div>
 
             {drawerLoading ? (
-
               <div className="drawer-loading">
                 Loading clinical record...
               </div>
-
             ) : (
-
               <div className="drawer-content">
-
-                {/* EDIT BUTTON */}
-
                 <div className="section-header-flex">
-
                   <h3>Client Profile</h3>
 
                   <button
@@ -833,21 +764,15 @@ function Clients() {
                   >
                     Edit Client
                   </button>
-
                 </div>
 
-                {/* CONSENT */}
-
                 <div className="drawer-section">
-
                   <h3>
                     Compliance & Digital Consent
                   </h3>
 
                   <div className="consent-detail-box">
-
                     <div className="detail-row">
-
                       <span>
                         Informed Consent:
                       </span>
@@ -858,14 +783,11 @@ function Clients() {
                           ? "✓ Verified Signed"
                           : "Pending Signature"}
                       </strong>
-
                     </div>
 
                     {clientDetails?.client
                       ?.consent?.timestamp && (
-
                       <div className="detail-row">
-
                         <span>
                           Signed Timestamp:
                         </span>
@@ -876,16 +798,12 @@ function Clients() {
                               .consent.timestamp
                           ).toLocaleString()}
                         </code>
-
                       </div>
-
                     )}
 
                     {clientDetails?.client
                       ?.consent?.ipAddress && (
-
                       <div className="detail-row">
-
                         <span>
                           Auditable IP:
                         </span>
@@ -896,25 +814,17 @@ function Clients() {
                               .consent.ipAddress
                           }
                         </code>
-
                       </div>
-
                     )}
-
                   </div>
-
                 </div>
 
-                {/* DEMOGRAPHICS */}
-
                 <div className="drawer-section">
-
                   <h3>
                     Clinical Demographics & Background
                   </h3>
 
                   <div className="demographics-grid">
-
                     <div>
                       <span>Age:</span>{" "}
                       <strong>
@@ -952,11 +862,9 @@ function Clients() {
                           "Not specified"}
                       </strong>
                     </div>
-
                   </div>
 
                   <div className="concern-box">
-
                     <p>
                       <strong>
                         Presenting Concern:
@@ -965,11 +873,9 @@ function Clients() {
                         ?.presentingConcern ||
                         "None recorded"}
                     </p>
-
                   </div>
 
                   <div className="concern-box">
-
                     <p>
                       <strong>
                         Previous History:
@@ -978,15 +884,10 @@ function Clients() {
                         ?.history ||
                         "None recorded"}
                     </p>
-
                   </div>
-
                 </div>
 
-                {/* SESSION HISTORY */}
-
                 <div className="drawer-section">
-
                   <h3>
                     Session History (
                     {clientDetails?.sessions
@@ -996,18 +897,14 @@ function Clients() {
 
                   {clientDetails?.sessions
                     ?.length > 0 ? (
-
                     <div className="mini-session-list">
-
                       {clientDetails.sessions
                         .slice(0, 5)
                         .map((session) => (
-
                           <div
                             key={session._id}
                             className="mini-session-item"
                           >
-
                             <span>
                               {new Date(
                                 session.startTime
@@ -1031,29 +928,18 @@ function Clients() {
                             >
                               {session.status}
                             </span>
-
                           </div>
-
                         ))}
-
                     </div>
-
                   ) : (
-
                     <p className="empty-subtext">
                       No session history yet.
                     </p>
-
                   )}
-
                 </div>
 
-                {/* CLINICAL NOTES */}
-
                 <div className="drawer-section">
-
                   <div className="section-header-flex">
-
                     <h3>
                       Clinical Notes (
                       {clientDetails?.notes
@@ -1071,24 +957,18 @@ function Clients() {
                     >
                       Open Notes Editor →
                     </button>
-
                   </div>
 
                   {clientDetails?.notes
                     ?.length > 0 ? (
-
                     <div className="mini-notes-list">
-
                       {clientDetails.notes.map(
                         (note) => (
-
                           <div
                             key={note._id}
                             className="mini-note-card"
                           >
-
                             <div className="mini-note-header">
-
                               <strong>
                                 {note.title}
                               </strong>
@@ -1101,7 +981,6 @@ function Clients() {
                                   ? "Shared"
                                   : "Private"}
                               </span>
-
                             </div>
 
                             <small>
@@ -1112,46 +991,26 @@ function Clients() {
                                 note.createdAt
                               ).toLocaleDateString()}
                             </small>
-
                           </div>
-
                         )
                       )}
-
                     </div>
-
                   ) : (
-
                     <p className="empty-subtext">
                       No clinical notes recorded yet.
                     </p>
-
                   )}
-
                 </div>
-
               </div>
-
             )}
-
           </div>
-
         </div>
-
       )}
 
-      {/* ==========================================
-          EDIT CLIENT MODAL
-      ========================================== */}
-
       {isEditModalOpen && (
-
         <div className="modal-backdrop">
-
           <div className="client-modal-card">
-
             <div className="modal-header">
-
               <div>
                 <span className="modal-label">
                   EXISTING CLIENT RECORD
@@ -1172,7 +1031,6 @@ function Clients() {
               >
                 ✕
               </button>
-
             </div>
 
             {editError && (
@@ -1185,9 +1043,6 @@ function Clients() {
               onSubmit={handleUpdateClient}
               className="modal-form"
             >
-
-              {/* BASIC INFORMATION */}
-
               <div className="form-group">
                 <label>Full Name *</label>
 
@@ -1226,10 +1081,7 @@ function Clients() {
                 />
               </div>
 
-              {/* CLINICAL DEMOGRAPHICS */}
-
               <div className="drawer-section">
-
                 <h3>
                   Clinical Demographics & Background
                 </h3>
@@ -1288,13 +1140,9 @@ function Clients() {
                     }
                   />
                 </div>
-
               </div>
 
-              {/* CLINICAL INFORMATION */}
-
               <div className="form-group">
-
                 <label>
                   Presenting Concern
                 </label>
@@ -1306,11 +1154,9 @@ function Clients() {
                     setEditConcern(e.target.value)
                   }
                 />
-
               </div>
 
               <div className="form-group">
-
                 <label>
                   Previous History
                 </label>
@@ -1323,13 +1169,9 @@ function Clients() {
                     setEditHistory(e.target.value)
                   }
                 />
-
               </div>
 
-              {/* STATUS */}
-
               <div className="form-group">
-
                 <label>
                   Client Status
                 </label>
@@ -1352,16 +1194,10 @@ function Clients() {
                     Archived
                   </option>
                 </select>
-
               </div>
 
-              {/* TAGS */}
-
               <div className="form-group">
-
-                <label>
-                  Tags
-                </label>
+                <label>Tags</label>
 
                 <input
                   type="text"
@@ -1375,13 +1211,9 @@ function Clients() {
                 <small>
                   Separate multiple tags with commas.
                 </small>
-
               </div>
 
-              {/* ACTIONS */}
-
               <div className="modal-actions">
-
                 <button
                   type="button"
                   className="modal-cancel-btn"
@@ -1402,18 +1234,11 @@ function Clients() {
                     ? "Saving..."
                     : "Save Changes"}
                 </button>
-
               </div>
-
             </form>
-
           </div>
-
         </div>
-
       )}
-
-      {/* UPGRADE MODAL */}
 
       <UpgradeModal
         isOpen={upgradeModal.isOpen}
@@ -1422,7 +1247,6 @@ function Clients() {
         requiredTier={upgradeModal.requiredTier}
         message={upgradeModal.message}
       />
-
     </div>
   );
 }
