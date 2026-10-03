@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import "./DoctorsDirectory.css";
-
-const API = "http://localhost:5000/api";
 
 const SPECIALIZATIONS = [
   "All",
@@ -60,10 +58,16 @@ function DoctorsDirectory() {
     try {
       setLoading(true);
       setError("");
-      const res = await axios.get(`${API}/therapists/public`);
+
+      const res = await axiosInstance.get(
+        "/therapists/public"
+      );
+
       setDoctors(res.data.therapists || []);
     } catch (err) {
-      setError("Unable to load doctors. Please try again.");
+      setError(
+        "Unable to load doctors. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -73,10 +77,14 @@ function DoctorsDirectory() {
     const matchSpec =
       selectedSpec === "All" ||
       (doc.specializations || []).some((s) =>
-        s.toLowerCase().includes(selectedSpec.toLowerCase())
+        s.toLowerCase().includes(
+          selectedSpec.toLowerCase()
+        )
       );
 
-    const searchLower = search.toLowerCase().trim();
+    const searchLower =
+      search.toLowerCase().trim();
+
     const matchSearch =
       !searchLower ||
       doc.name?.toLowerCase().includes(searchLower) ||
@@ -100,26 +108,43 @@ function DoctorsDirectory() {
 
         <div className="dir-nav-links">
           <Link to="/">Home</Link>
-          <Link to="/therapist/login" className="nav-login">Therapist Login</Link>
+
+          <Link
+            to="/therapist/login"
+            className="nav-login"
+          >
+            Therapist Login
+          </Link>
         </div>
       </nav>
 
       {/* Page Header */}
       <div className="dir-header">
-        <p className="dir-label">FIND A SPECIALIST</p>
+        <p className="dir-label">
+          FIND A SPECIALIST
+        </p>
+
         <h1>Find the Right Doctor for You</h1>
+
         <p className="dir-subtitle">
-          Browse our network of verified specialists. Choose by specialization and book a session instantly.
+          Browse our network of verified specialists.
+          Choose by specialization and book a session
+          instantly.
         </p>
 
         {/* Search */}
         <div className="dir-search-wrap">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon">
+            🔍
+          </span>
+
           <input
             type="text"
             placeholder="Search by name or specialization..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
             className="dir-search"
           />
         </div>
@@ -130,10 +155,18 @@ function DoctorsDirectory() {
         {SPECIALIZATIONS.map((spec) => (
           <button
             key={spec}
-            className={`spec-chip ${selectedSpec === spec ? "active" : ""}`}
-            onClick={() => setSelectedSpec(spec)}
+            className={`spec-chip ${
+              selectedSpec === spec
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setSelectedSpec(spec)
+            }
           >
-            {spec !== "All" && (SPEC_ICONS[spec] || "🩺")} {spec}
+            {spec !== "All" &&
+              (SPEC_ICONS[spec] || "🩺")}{" "}
+            {spec}
           </button>
         ))}
       </div>
@@ -143,7 +176,17 @@ function DoctorsDirectory() {
         <div className="dir-results-info">
           {filteredDoctors.length === 0
             ? "No doctors found for your search."
-            : `Showing ${filteredDoctors.length} doctor${filteredDoctors.length !== 1 ? "s" : ""}${selectedSpec !== "All" ? ` · ${selectedSpec}` : ""}`}
+            : `Showing ${
+                filteredDoctors.length
+              } doctor${
+                filteredDoctors.length !== 1
+                  ? "s"
+                  : ""
+              }${
+                selectedSpec !== "All"
+                  ? ` · ${selectedSpec}`
+                  : ""
+              }`}
         </div>
       )}
 
@@ -151,36 +194,62 @@ function DoctorsDirectory() {
       <div className="dir-cards-grid">
 
         {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="doctor-card skeleton-card">
-              <div className="skeleton-avatar"></div>
-              <div className="skeleton-lines">
-                <div className="skeleton-line long"></div>
-                <div className="skeleton-line short"></div>
-                <div className="skeleton-line medium"></div>
+          Array.from({ length: 6 }).map(
+            (_, i) => (
+              <div
+                key={i}
+                className="doctor-card skeleton-card"
+              >
+                <div className="skeleton-avatar"></div>
+
+                <div className="skeleton-lines">
+                  <div className="skeleton-line long"></div>
+                  <div className="skeleton-line short"></div>
+                  <div className="skeleton-line medium"></div>
+                </div>
               </div>
-            </div>
-          ))
+            )
+          )
         ) : error ? (
           <div className="dir-error">
             <p>{error}</p>
-            <button onClick={fetchDoctors} className="retry-btn">Retry</button>
+
+            <button
+              onClick={fetchDoctors}
+              className="retry-btn"
+            >
+              Retry
+            </button>
           </div>
         ) : filteredDoctors.length === 0 ? (
           <div className="dir-empty">
-            <div className="empty-icon">🔍</div>
+            <div className="empty-icon">
+              🔍
+            </div>
+
             <h3>No doctors found</h3>
-            <p>Try a different specialization or clear your search.</p>
+
+            <p>
+              Try a different specialization or
+              clear your search.
+            </p>
+
             <button
               className="retry-btn"
-              onClick={() => { setSelectedSpec("All"); setSearch(""); }}
+              onClick={() => {
+                setSelectedSpec("All");
+                setSearch("");
+              }}
             >
               Clear Filters
             </button>
           </div>
         ) : (
           filteredDoctors.map((doc) => (
-            <div key={doc._id} className="doctor-card">
+            <div
+              key={doc._id}
+              className="doctor-card"
+            >
 
               {/* Avatar / Image */}
               <div className="doctor-card-top">
@@ -190,51 +259,80 @@ function DoctorsDirectory() {
                     alt={doc.name}
                     className="doctor-avatar-img"
                     onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "flex";
+                      e.target.style.display =
+                        "none";
+
+                      e.target.nextSibling.style.display =
+                        "flex";
                     }}
                   />
                 ) : null}
+
                 <div
                   className="doctor-avatar-fallback"
-                  style={{ display: doc.profileImage ? "none" : "flex" }}
+                  style={{
+                    display: doc.profileImage
+                      ? "none"
+                      : "flex",
+                  }}
                 >
-                  {(doc.name || "?").charAt(0).toUpperCase()}
+                  {(doc.name || "?")
+                    .charAt(0)
+                    .toUpperCase()}
                 </div>
 
                 <div className="doctor-card-info">
-                  <h3 className="doctor-name">{doc.name}</h3>
+                  <h3 className="doctor-name">
+                    {doc.name}
+                  </h3>
+
                   <p className="doctor-spec">
-                    {SPEC_ICONS[doc.specializations?.[0]] || "🩺"}{" "}
-                    {doc.specializations?.join(", ") || "General Practice"}
+                    {SPEC_ICONS[
+                      doc.specializations?.[0]
+                    ] || "🩺"}{" "}
+                    {doc.specializations?.join(
+                      ", "
+                    ) ||
+                      "General Practice"}
                   </p>
+
                   {doc.experience > 0 && (
-                    <p className="doctor-exp">⏱ {doc.experience} years exp.</p>
+                    <p className="doctor-exp">
+                      ⏱ {doc.experience} years exp.
+                    </p>
                   )}
                 </div>
               </div>
 
               {/* Qualifications */}
               {doc.qualification && (
-                <p className="doctor-qualification">🎓 {doc.qualification}</p>
+                <p className="doctor-qualification">
+                  🎓 {doc.qualification}
+                </p>
               )}
 
               {/* Languages */}
               {doc.languages?.length > 0 && (
                 <p className="doctor-langs">
-                  🗣 {doc.languages.join(", ")}
+                  🗣{" "}
+                  {doc.languages.join(", ")}
                 </p>
               )}
 
               {/* Bio snippet */}
               <p className="doctor-bio">
-                {doc.bio?.length > 130 ? doc.bio.slice(0, 130) + "..." : doc.bio}
+                {doc.bio?.length > 130
+                  ? doc.bio.slice(0, 130) + "..."
+                  : doc.bio}
               </p>
 
               {/* Fee */}
               {doc.consultationFee > 0 && (
                 <p className="doctor-fee">
-                  💰 Consultation: <strong>₹{doc.consultationFee}</strong>
+                  💰 Consultation:{" "}
+                  <strong>
+                    ₹{doc.consultationFee}
+                  </strong>
                 </p>
               )}
 
@@ -242,13 +340,22 @@ function DoctorsDirectory() {
               <div className="doctor-card-actions">
                 <button
                   className="card-view-btn"
-                  onClick={() => navigate(`/therapist/${doc.slug}`)}
+                  onClick={() =>
+                    navigate(
+                      `/therapist/${doc.slug}`
+                    )
+                  }
                 >
                   View Profile
                 </button>
+
                 <button
                   className="card-book-btn"
-                  onClick={() => navigate(`/therapist/${doc.slug}/book`)}
+                  onClick={() =>
+                    navigate(
+                      `/therapist/${doc.slug}/book`
+                    )
+                  }
                 >
                   Book Session →
                 </button>
@@ -262,7 +369,9 @@ function DoctorsDirectory() {
 
       {/* Footer */}
       <footer className="dir-footer">
-        <p>© 2026 UNFAZED · Your health, your choice.</p>
+        <p>
+          © 2026 UNFAZED · Your health, your choice.
+        </p>
       </footer>
 
     </div>
@@ -270,4 +379,3 @@ function DoctorsDirectory() {
 }
 
 export default DoctorsDirectory;
-

@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import "./BookingPage.css";
-
-const API_BASE_URL = "http://localhost:5000/api";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -124,8 +122,10 @@ function BookingPage() {
   const { slug } = useParams();
 
   const [therapist, setTherapist] = useState(null);
+
   const [loadingTherapist, setLoadingTherapist] =
     useState(true);
+
   const [therapistError, setTherapistError] =
     useState("");
 
@@ -134,8 +134,10 @@ function BookingPage() {
   });
 
   const [slots, setSlots] = useState([]);
+
   const [loadingSlots, setLoadingSlots] =
     useState(false);
+
   const [slotsError, setSlotsError] = useState("");
 
   const [selectedSlot, setSelectedSlot] =
@@ -173,6 +175,7 @@ function BookingPage() {
     useState(null);
 
   const [packages, setPackages] = useState([]);
+
   const [packagesLoading, setPackagesLoading] =
     useState(false);
 
@@ -190,8 +193,8 @@ function BookingPage() {
       setLoadingTherapist(true);
       setTherapistError("");
 
-      const response = await axios.get(
-        `${API_BASE_URL}/therapists/public/${slug}`
+      const response = await axiosInstance.get(
+        "/therapists/public/" + slug
       );
 
       setTherapist(response.data?.therapist || null);
@@ -222,8 +225,8 @@ function BookingPage() {
         setLoadingSlots(true);
         setSlotsError("");
 
-        const response = await axios.get(
-          `${API_BASE_URL}/scheduling/slots`,
+        const response = await axiosInstance.get(
+          "/scheduling/slots",
           {
             params: {
               therapistId,
@@ -263,8 +266,8 @@ function BookingPage() {
       try {
         setPackagesLoading(true);
 
-        const response = await axios.get(
-          `${API_BASE_URL}/payments/public/packages`,
+        const response = await axiosInstance.get(
+          "/payments/public/packages",
           {
             params: {
               therapistId,
@@ -360,6 +363,7 @@ function BookingPage() {
 
   /* =====================================================
      SLOT SELECTION
+
      IMPORTANT:
      selected slot is identified ONLY by startTime.
      This prevents undefined IDs from making every
@@ -379,6 +383,7 @@ function BookingPage() {
       setBookingError(
         "Please select an available slot first."
       );
+
       return;
     }
 
@@ -451,7 +456,9 @@ function BookingPage() {
 
   /* =====================================================
      PAYMENT OPTIONS
+
      Single Session = fixed ₹900
+
      Packages = 3 / 6 / 12 from backend
      ===================================================== */
 
@@ -483,6 +490,7 @@ function BookingPage() {
       setBookingError(
         "Please select an available slot."
       );
+
       return;
     }
 
@@ -499,16 +507,20 @@ function BookingPage() {
 
       const bookingPayload = {
         therapistId: therapist._id,
+
         startTime: selectedSlot.startTime,
         endTime: selectedSlot.endTime,
 
         clientName: clientName.trim(),
+
         clientEmail:
           clientEmail.trim().toLowerCase(),
+
         clientPhone: clientPhone.trim(),
 
         age: Number(age),
         gender,
+
         occupation: occupation.trim(),
         location: location.trim(),
 
@@ -522,10 +534,11 @@ function BookingPage() {
         timezone: clientTimezone,
       };
 
-      const bookingResponse = await axios.post(
-        `${API_BASE_URL}/scheduling/book`,
-        bookingPayload
-      );
+      const bookingResponse =
+        await axiosInstance.post(
+          "/scheduling/book",
+          bookingPayload
+        );
 
       const bookedSession =
         bookingResponse.data?.session;
@@ -562,10 +575,11 @@ function BookingPage() {
           selectedPackage._id;
       }
 
-      const orderResponse = await axios.post(
-        `${API_BASE_URL}/payments/public/order`,
-        orderPayload
-      );
+      const orderResponse =
+        await axiosInstance.post(
+          "/payments/public/order",
+          orderPayload
+        );
 
       const orderData = orderResponse.data;
 
@@ -584,8 +598,11 @@ function BookingPage() {
 
       const razorpayOptions = {
         key: orderData.keyId,
+
         amount: orderData.amount,
-        currency: orderData.currency || "INR",
+
+        currency:
+          orderData.currency || "INR",
 
         name: "UNFAZED",
 
@@ -611,7 +628,9 @@ function BookingPage() {
 
         notes: {
           therapist: therapist.name,
+
           sessionId: bookedSession.id,
+
           paymentType: selectedPackage
             ? "package"
             : "single-session",
@@ -627,8 +646,8 @@ function BookingPage() {
             setBookingError("");
 
             const verifyResponse =
-              await axios.post(
-                `${API_BASE_URL}/payments/public/verify`,
+              await axiosInstance.post(
+                "/payments/public/verify",
                 {
                   razorpay_order_id:
                     razorpayResponse.razorpay_order_id,
@@ -712,7 +731,9 @@ function BookingPage() {
       };
 
       const razorpayCheckout =
-        new window.Razorpay(razorpayOptions);
+        new window.Razorpay(
+          razorpayOptions
+        );
 
       razorpayCheckout.on(
         "payment.failed",
@@ -756,6 +777,7 @@ function BookingPage() {
     setBookingConfirmation(null);
     setSelectedSlot(null);
     setBookingError("");
+
     resetForm();
 
     if (therapist?._id) {
@@ -878,7 +900,9 @@ function BookingPage() {
                   THERAPIST
                 </p>
 
-                <h1>{therapist.name}</h1>
+                <h1>
+                  {therapist.name}
+                </h1>
 
                 <p className="therapist-specialties-text">
                   {therapist.qualification ||
@@ -937,6 +961,7 @@ function BookingPage() {
               </div>
 
               <div className="slots-section-header">
+
                 <h2>
                   Available Slots
                 </h2>
@@ -944,6 +969,7 @@ function BookingPage() {
                 <span className="slots-tz-badge">
                   {clientTimezone}
                 </span>
+
               </div>
 
               {loadingSlots ? (
@@ -958,7 +984,9 @@ function BookingPage() {
                 </div>
               ) : slotsError ? (
                 <div className="no-slots">
-                  <p>{slotsError}</p>
+                  <p>
+                    {slotsError}
+                  </p>
 
                   <button
                     type="button"
@@ -995,6 +1023,7 @@ function BookingPage() {
                      * Never compare possibly undefined
                      * id/_id values.
                      */
+
                     const isSelected =
                       selectedSlot?.startTime ===
                       slot.startTime;
@@ -1020,15 +1049,19 @@ function BookingPage() {
                         }
                       >
                         <span className="slot-time-range">
+
                           {formatTime(
                             slot.startTime,
                             clientTimezone
                           )}
+
                           {" - "}
+
                           {formatTime(
                             slot.endTime,
                             clientTimezone
                           )}
+
                         </span>
 
                         <span className="slot-check">
@@ -1061,7 +1094,9 @@ function BookingPage() {
                         selectedSlot.startTime,
                         clientTimezone
                       )}
+
                       {" - "}
+
                       {formatTime(
                         selectedSlot.endTime,
                         clientTimezone
@@ -1253,6 +1288,7 @@ function BookingPage() {
               }
             }}
           >
+
             <div className="booking-modal-card">
 
               <div className="modal-header">
@@ -1286,6 +1322,7 @@ function BookingPage() {
                   <strong>
                     Date:
                   </strong>{" "}
+
                   {formatDate(
                     selectedSlot.startTime
                   )}
@@ -1295,11 +1332,14 @@ function BookingPage() {
                   <strong>
                     Time:
                   </strong>{" "}
+
                   {formatTime(
                     selectedSlot.startTime,
                     clientTimezone
                   )}
+
                   {" - "}
+
                   {formatTime(
                     selectedSlot.endTime,
                     clientTimezone
@@ -1310,6 +1350,7 @@ function BookingPage() {
                   <strong>
                     Timezone:
                   </strong>{" "}
+
                   {clientTimezone}
                 </p>
 
@@ -1329,6 +1370,7 @@ function BookingPage() {
               >
 
                 <div className="form-group">
+
                   <label htmlFor="client-name">
                     Full Name *
                   </label>
@@ -1345,9 +1387,11 @@ function BookingPage() {
                     placeholder="Enter your full name"
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-email">
                     Email Address *
                   </label>
@@ -1364,9 +1408,11 @@ function BookingPage() {
                     placeholder="you@example.com"
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-phone">
                     Phone Number *
                   </label>
@@ -1383,9 +1429,11 @@ function BookingPage() {
                     placeholder="Enter your phone number"
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-age">
                     Age *
                   </label>
@@ -1404,9 +1452,11 @@ function BookingPage() {
                     placeholder="Enter your age"
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-gender">
                     Gender *
                   </label>
@@ -1421,6 +1471,7 @@ function BookingPage() {
                     }
                     disabled={bookingLoading}
                   >
+
                     <option value="">
                       Select gender
                     </option>
@@ -1440,10 +1491,13 @@ function BookingPage() {
                     <option value="Prefer not to say">
                       Prefer not to say
                     </option>
+
                   </select>
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-occupation">
                     Occupation *
                   </label>
@@ -1460,9 +1514,11 @@ function BookingPage() {
                     placeholder="Student, Engineer, Teacher..."
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-location">
                     Location *
                   </label>
@@ -1479,9 +1535,11 @@ function BookingPage() {
                     placeholder="City / Location"
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="presenting-concern">
                     Main Concern *
                   </label>
@@ -1497,9 +1555,11 @@ function BookingPage() {
                     placeholder="Briefly describe what you would like help with..."
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-history">
                     Relevant History
                   </label>
@@ -1515,9 +1575,11 @@ function BookingPage() {
                     placeholder="Any relevant background information..."
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 <div className="form-group">
+
                   <label htmlFor="client-notes">
                     Additional Notes
                   </label>
@@ -1533,6 +1595,7 @@ function BookingPage() {
                     placeholder="Anything else you would like the therapist to know..."
                     disabled={bookingLoading}
                   />
+
                 </div>
 
                 {/* PAYMENT OPTIONS */}
@@ -1597,6 +1660,7 @@ function BookingPage() {
                 <div className="payment-summary">
 
                   <div>
+
                     <span>
                       Selected Plan
                     </span>
@@ -1604,9 +1668,11 @@ function BookingPage() {
                     <strong>
                       {selectedPaymentLabel}
                     </strong>
+
                   </div>
 
                   <div>
+
                     <span>
                       Total
                     </span>
@@ -1616,6 +1682,7 @@ function BookingPage() {
                         selectedPaymentAmount
                       )}
                     </strong>
+
                   </div>
 
                 </div>
@@ -1667,6 +1734,7 @@ function BookingPage() {
                     className="modal-submit-btn"
                     disabled={bookingLoading}
                   >
+
                     {bookingLoading ? (
                       <>
                         <span className="button-spinner"></span>
@@ -1677,6 +1745,7 @@ function BookingPage() {
                         selectedPaymentAmount
                       )}`
                     )}
+
                   </button>
 
                 </div>
@@ -1684,6 +1753,7 @@ function BookingPage() {
               </form>
 
             </div>
+
           </div>
         )}
 

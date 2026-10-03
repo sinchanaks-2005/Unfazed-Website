@@ -1,21 +1,29 @@
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+
+import axiosInstance from "../../api/axiosInstance";
+
 import { io } from "socket.io-client";
 
-const SOCKET_URL = "http://localhost:5000";
-const API_URL = "http://localhost:5000/api";
+const SOCKET_URL =
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") ||
+  "http://localhost:5000";
 
 function ClientChat() {
   const socketRef = useRef(null);
 
   const [messages, setMessages] = useState([]);
+
   const [messageText, setMessageText] = useState("");
+
   const [typingUser, setTypingUser] = useState("");
+
   const [loading, setLoading] = useState(true);
+
   const [connectionError, setConnectionError] =
     useState("");
 
   const [clientId, setClientId] = useState("");
+
   const [therapistId, setTherapistId] = useState("");
 
   const [clientName, setClientName] =
@@ -56,8 +64,11 @@ function ClientChat() {
       "Therapist";
 
     setClientId(urlClientId);
+
     setTherapistId(urlTherapistId);
+
     setClientName(urlClientName);
+
     setTherapistName(urlTherapistName);
   }, []);
 
@@ -81,8 +92,8 @@ function ClientChat() {
           return;
         }
 
-        const response = await axios.get(
-          `${API_URL}/chat/history/${clientId}`,
+        const response = await axiosInstance.get(
+          `/chat/history/${clientId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

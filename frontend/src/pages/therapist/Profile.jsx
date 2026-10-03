@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import "./Profile.css";
 
 function Profile() {
@@ -11,7 +11,6 @@ function Profile() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-
   const [bio, setBio] = useState("");
   const [specializations, setSpecializations] = useState("");
   const [languages, setLanguages] = useState("");
@@ -32,8 +31,8 @@ function Profile() {
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:5000/api/therapists/profile",
+        const response = await axiosInstance.get(
+          "/therapists/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -99,7 +98,6 @@ function Profile() {
 
   const handleCancel = () => {
     setName(therapist.name || "");
-
     setBio(therapist.bio || "");
 
     setSpecializations(
@@ -133,8 +131,8 @@ function Profile() {
         .map((item) => item.trim())
         .filter((item) => item !== "");
 
-      const response = await axios.put(
-        "http://localhost:5000/api/therapists/profile",
+      const response = await axiosInstance.put(
+        "/therapists/profile",
         {
           name: name.trim(),
           bio: bio.trim(),
@@ -154,9 +152,7 @@ function Profile() {
       setTherapist(updatedTherapist);
 
       setName(updatedTherapist.name || "");
-
       setEmail(updatedTherapist.email || "");
-
       setBio(updatedTherapist.bio || "");
 
       setSpecializations(
@@ -208,7 +204,6 @@ function Profile() {
     return (
       <div className="profile-loading">
         <div className="profile-loader"></div>
-
         <p>Loading your profile...</p>
       </div>
     );
@@ -220,11 +215,9 @@ function Profile() {
 
   return (
     <div className="profile-page">
-
       {/* Top Header */}
 
       <header className="profile-topbar">
-
         <button
           className="back-button"
           onClick={() =>
@@ -235,36 +228,25 @@ function Profile() {
         </button>
 
         <div className="profile-page-title">
-
           <span>THERAPIST PORTAL</span>
-
           <h1>My Profile</h1>
-
         </div>
-
       </header>
 
       <div className="profile-layout">
-
         {/* =====================================
             LEFT PROFILE CARD
         ====================================== */}
 
         <aside className="profile-side-card">
-
           <div className="profile-cover"></div>
 
           <div className="profile-avatar-large">
-
             {name.charAt(0).toUpperCase() || "T"}
-
           </div>
 
           <div className="profile-side-content">
-
-            <h2>
-              {name || "Therapist"}
-            </h2>
+            <h2>{name || "Therapist"}</h2>
 
             <p className="profile-role">
               Therapist
@@ -275,11 +257,8 @@ function Profile() {
             </p>
 
             <div className="profile-status">
-
               <span></span>
-
               Profile Active
-
             </div>
 
             <div className="side-divider"></div>
@@ -287,19 +266,11 @@ function Profile() {
             {/* Public Profile */}
 
             <div className="public-profile-title">
-
-              <span>
-                PUBLIC PROFILE
-              </span>
-
-              <h3>
-                Your Branded Link
-              </h3>
-
+              <span>PUBLIC PROFILE</span>
+              <h3>Your Branded Link</h3>
             </div>
 
             <div className="branded-link-box">
-
               <span>
                 unfazed.com/therapist/
               </span>
@@ -307,7 +278,6 @@ function Profile() {
               <strong>
                 {therapist.slug || "your-profile"}
               </strong>
-
             </div>
 
             <button
@@ -317,9 +287,7 @@ function Profile() {
             >
               View Public Profile
             </button>
-
           </div>
-
         </aside>
 
         {/* =====================================
@@ -327,9 +295,7 @@ function Profile() {
         ====================================== */}
 
         <main className="profile-main-content">
-
           <div className="profile-intro">
-
             <span>
               PROFESSIONAL INFORMATION
             </span>
@@ -345,47 +311,34 @@ function Profile() {
                 ? "Update your information and save your changes."
                 : "Review your professional information and profile details."}
             </p>
-
           </div>
 
           <form
             className="professional-form"
             onSubmit={handleSubmit}
           >
-
             {/* =====================================
                 PERSONAL INFORMATION
             ====================================== */}
 
             <section className="profile-form-card">
-
               <div className="form-card-heading">
-
                 <div className="heading-icon">
                   👤
                 </div>
 
                 <div>
-
-                  <h3>
-                    Personal Information
-                  </h3>
+                  <h3>Personal Information</h3>
 
                   <p>
                     Your basic account information
                   </p>
-
                 </div>
-
               </div>
 
               <div className="form-grid">
-
                 <div className="profile-field">
-
-                  <label>
-                    Full Name
-                  </label>
+                  <label>Full Name</label>
 
                   <input
                     type="text"
@@ -396,14 +349,10 @@ function Profile() {
                     disabled={!isEditing}
                     required
                   />
-
                 </div>
 
                 <div className="profile-field">
-
-                  <label>
-                    Email Address
-                  </label>
+                  <label>Email Address</label>
 
                   <input
                     type="email"
@@ -414,11 +363,8 @@ function Profile() {
                   <small>
                     Email cannot be changed here.
                   </small>
-
                 </div>
-
               </div>
-
             </section>
 
             {/* =====================================
@@ -426,32 +372,22 @@ function Profile() {
             ====================================== */}
 
             <section className="profile-form-card">
-
               <div className="form-card-heading">
-
                 <div className="heading-icon">
                   ✦
                 </div>
 
                 <div>
-
-                  <h3>
-                    About You
-                  </h3>
+                  <h3>About You</h3>
 
                   <p>
                     Introduce yourself to potential clients
                   </p>
-
                 </div>
-
               </div>
 
               <div className="profile-field">
-
-                <label>
-                  Professional Bio
-                </label>
+                <label>Professional Bio</label>
 
                 <textarea
                   rows="6"
@@ -467,9 +403,7 @@ function Profile() {
                   A clear and welcoming introduction helps
                   clients understand your approach.
                 </small>
-
               </div>
-
             </section>
 
             {/* =====================================
@@ -477,38 +411,30 @@ function Profile() {
             ====================================== */}
 
             <section className="profile-form-card">
-
               <div className="form-card-heading">
-
                 <div className="heading-icon">
                   ☆
                 </div>
 
                 <div>
-
-                  <h3>
-                    Areas of Expertise
-                  </h3>
+                  <h3>Areas of Expertise</h3>
 
                   <p>
                     Highlight the areas where you help clients
                   </p>
-
                 </div>
-
               </div>
 
               <div className="profile-field">
-
-                <label>
-                  Specializations
-                </label>
+                <label>Specializations</label>
 
                 <input
                   type="text"
                   value={specializations}
                   onChange={(e) =>
-                    setSpecializations(e.target.value)
+                    setSpecializations(
+                      e.target.value
+                    )
                   }
                   disabled={!isEditing}
                   placeholder="Anxiety, Stress Management..."
@@ -517,14 +443,10 @@ function Profile() {
                 <small>
                   Separate multiple specializations with commas.
                 </small>
-
               </div>
 
               <div className="profile-field">
-
-                <label>
-                  Languages
-                </label>
+                <label>Languages</label>
 
                 <input
                   type="text"
@@ -539,9 +461,7 @@ function Profile() {
                 <small>
                   Separate multiple languages with commas.
                 </small>
-
               </div>
-
             </section>
 
             {/* =====================================
@@ -549,12 +469,9 @@ function Profile() {
             ====================================== */}
 
             <div className="profile-save-area">
-
               {!isEditing ? (
-
                 <>
                   <div>
-
                     <strong>
                       Want to update your information?
                     </strong>
@@ -562,7 +479,6 @@ function Profile() {
                     <span>
                       You can edit your professional profile anytime.
                     </span>
-
                   </div>
 
                   <button
@@ -573,12 +489,9 @@ function Profile() {
                     Edit Profile
                   </button>
                 </>
-
               ) : (
-
                 <>
                   <div>
-
                     <strong>
                       Editing your profile
                     </strong>
@@ -587,11 +500,9 @@ function Profile() {
                       Save your changes or cancel to keep
                       the previous information.
                     </span>
-
                   </div>
 
                   <div className="profile-action-buttons">
-
                     <button
                       type="button"
                       className="cancel-profile-button"
@@ -606,21 +517,13 @@ function Profile() {
                     >
                       Save Changes
                     </button>
-
                   </div>
-
                 </>
-
               )}
-
             </div>
-
           </form>
-
         </main>
-
       </div>
-
     </div>
   );
 }

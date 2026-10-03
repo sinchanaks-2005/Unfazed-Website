@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import "./Dashboard.css";
-
-const API = "http://localhost:5000/api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -37,8 +35,8 @@ function Dashboard() {
         return;
       }
 
-      const sessionsRes = await axios.get(
-        `${API}/scheduling/sessions`,
+      const sessionsRes = await axiosInstance.get(
+        "/scheduling/sessions",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -512,6 +510,7 @@ function Dashboard() {
                   </div>
 
                 ))
+
               )}
 
             </div>

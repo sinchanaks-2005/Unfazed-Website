@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
-const API_BASE = "http://localhost:5000/api";
 
 function Notes() {
   const [clients, setClients] = useState([]);
@@ -67,8 +65,8 @@ function Notes() {
     try {
       setLoadingClients(true);
 
-      const res = await axios.get(
-        `${API_BASE}/clients`,
+      const res = await axiosInstance.get(
+        "/clients",
         getAuthConfig()
       );
 
@@ -89,8 +87,8 @@ function Notes() {
     try {
       setLoadingNotes(true);
 
-      const res = await axios.get(
-        `${API_BASE}/notes/client/${clientId}`,
+      const res = await axiosInstance.get(
+        `/notes/client/${clientId}`,
         getAuthConfig()
       );
 
@@ -152,7 +150,9 @@ function Notes() {
 
     if (
       template === "freeform" &&
-      (!content || content === "<p></p>" || !editor?.getText().trim())
+      (!content ||
+        content === "<p></p>" ||
+        !editor?.getText().trim())
     ) {
       alert("Please enter note content.");
       return;
@@ -189,13 +189,16 @@ function Notes() {
         type,
         template,
         title: title.trim(),
-        content: template === "freeform" ? content : "",
-        soapData: template === "SOAP" ? soapData : {},
-        dapData: template === "DAP" ? dapData : {},
+        content:
+          template === "freeform" ? content : "",
+        soapData:
+          template === "SOAP" ? soapData : {},
+        dapData:
+          template === "DAP" ? dapData : {},
       };
 
-      await axios.post(
-        `${API_BASE}/notes`,
+      await axiosInstance.post(
+        "/notes",
         payload,
         getAuthConfig()
       );
@@ -315,17 +318,21 @@ function Notes() {
                 {clients.map((client) => (
                   <button
                     key={client._id}
-                    onClick={() => handleClientSelect(client)}
+                    onClick={() =>
+                      handleClientSelect(client)
+                    }
                     style={{
                       textAlign: "left",
                       padding: "12px",
                       borderRadius: "8px",
                       border:
-                        selectedClient?._id === client._id
+                        selectedClient?._id ===
+                        client._id
                           ? "2px solid #4f46e5"
                           : "1px solid #e5e7eb",
                       background:
-                        selectedClient?._id === client._id
+                        selectedClient?._id ===
+                        client._id
                           ? "#eef2ff"
                           : "#ffffff",
                       cursor: "pointer",
@@ -363,7 +370,8 @@ function Notes() {
                   borderRadius: "12px",
                   padding: "50px",
                   textAlign: "center",
-                  boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+                  boxShadow:
+                    "0 2px 10px rgba(0,0,0,0.06)",
                 }}
               >
                 <h2
@@ -388,7 +396,8 @@ function Notes() {
                     borderRadius: "12px",
                     padding: "20px",
                     marginBottom: "20px",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+                    boxShadow:
+                      "0 2px 10px rgba(0,0,0,0.06)",
                   }}
                 >
                   <h2
@@ -416,7 +425,8 @@ function Notes() {
                     borderRadius: "12px",
                     padding: "24px",
                     marginBottom: "24px",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+                    boxShadow:
+                      "0 2px 10px rgba(0,0,0,0.06)",
                   }}
                 >
                   <h2
@@ -432,7 +442,8 @@ function Notes() {
                     <div
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
+                        gridTemplateColumns:
+                          "1fr 1fr",
                         gap: "16px",
                         marginBottom: "16px",
                       }}
@@ -457,7 +468,8 @@ function Notes() {
                             width: "100%",
                             padding: "11px",
                             borderRadius: "7px",
-                            border: "1px solid #d1d5db",
+                            border:
+                              "1px solid #d1d5db",
                           }}
                         >
                           <option value="private">
@@ -484,9 +496,14 @@ function Notes() {
                         <select
                           value={template}
                           onChange={(e) => {
-                            setTemplate(e.target.value);
+                            setTemplate(
+                              e.target.value
+                            );
 
-                            if (e.target.value !== "freeform") {
+                            if (
+                              e.target.value !==
+                              "freeform"
+                            ) {
                               setContent("");
 
                               if (editor) {
@@ -498,7 +515,8 @@ function Notes() {
                             width: "100%",
                             padding: "11px",
                             borderRadius: "7px",
-                            border: "1px solid #d1d5db",
+                            border:
+                              "1px solid #d1d5db",
                           }}
                         >
                           <option value="freeform">
@@ -516,7 +534,11 @@ function Notes() {
                       </div>
                     </div>
 
-                    <div style={{ marginBottom: "16px" }}>
+                    <div
+                      style={{
+                        marginBottom: "16px",
+                      }}
+                    >
                       <label
                         style={{
                           display: "block",
@@ -538,14 +560,19 @@ function Notes() {
                           width: "100%",
                           padding: "11px",
                           borderRadius: "7px",
-                          border: "1px solid #d1d5db",
+                          border:
+                            "1px solid #d1d5db",
                           boxSizing: "border-box",
                         }}
                       />
                     </div>
 
                     {template === "freeform" && (
-                      <div style={{ marginBottom: "16px" }}>
+                      <div
+                        style={{
+                          marginBottom: "16px",
+                        }}
+                      >
                         <label
                           style={{
                             display: "block",
@@ -558,7 +585,8 @@ function Notes() {
 
                         <div
                           style={{
-                            border: "1px solid #d1d5db",
+                            border:
+                              "1px solid #d1d5db",
                             borderRadius: "7px",
                             overflow: "hidden",
                           }}
@@ -573,7 +601,8 @@ function Notes() {
                                   padding: "10px",
                                   borderBottom:
                                     "1px solid #e5e7eb",
-                                  background: "#f9fafb",
+                                  background:
+                                    "#f9fafb",
                                 }}
                               >
                                 <button
@@ -586,16 +615,22 @@ function Notes() {
                                       .run()
                                   }
                                   style={{
-                                    padding: "6px 10px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: "5px",
-                                    background: editor.isActive(
-                                      "bold"
-                                    )
-                                      ? "#e5e7eb"
-                                      : "#ffffff",
-                                    cursor: "pointer",
-                                    fontWeight: "700",
+                                    padding:
+                                      "6px 10px",
+                                    border:
+                                      "1px solid #d1d5db",
+                                    borderRadius:
+                                      "5px",
+                                    background:
+                                      editor.isActive(
+                                        "bold"
+                                      )
+                                        ? "#e5e7eb"
+                                        : "#ffffff",
+                                    cursor:
+                                      "pointer",
+                                    fontWeight:
+                                      "700",
                                   }}
                                 >
                                   B
@@ -611,16 +646,22 @@ function Notes() {
                                       .run()
                                   }
                                   style={{
-                                    padding: "6px 10px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: "5px",
-                                    background: editor.isActive(
-                                      "italic"
-                                    )
-                                      ? "#e5e7eb"
-                                      : "#ffffff",
-                                    cursor: "pointer",
-                                    fontStyle: "italic",
+                                    padding:
+                                      "6px 10px",
+                                    border:
+                                      "1px solid #d1d5db",
+                                    borderRadius:
+                                      "5px",
+                                    background:
+                                      editor.isActive(
+                                        "italic"
+                                      )
+                                        ? "#e5e7eb"
+                                        : "#ffffff",
+                                    cursor:
+                                      "pointer",
+                                    fontStyle:
+                                      "italic",
                                   }}
                                 >
                                   I
@@ -636,16 +677,20 @@ function Notes() {
                                       .run()
                                   }
                                   style={{
-                                    padding: "6px 10px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: "5px",
+                                    padding:
+                                      "6px 10px",
+                                    border:
+                                      "1px solid #d1d5db",
+                                    borderRadius:
+                                      "5px",
                                     background:
                                       editor.isActive(
                                         "bulletList"
                                       )
                                         ? "#e5e7eb"
                                         : "#ffffff",
-                                    cursor: "pointer",
+                                    cursor:
+                                      "pointer",
                                   }}
                                 >
                                   • List
@@ -661,16 +706,20 @@ function Notes() {
                                       .run()
                                   }
                                   style={{
-                                    padding: "6px 10px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: "5px",
+                                    padding:
+                                      "6px 10px",
+                                    border:
+                                      "1px solid #d1d5db",
+                                    borderRadius:
+                                      "5px",
                                     background:
                                       editor.isActive(
                                         "orderedList"
                                       )
                                         ? "#e5e7eb"
                                         : "#ffffff",
-                                    cursor: "pointer",
+                                    cursor:
+                                      "pointer",
                                   }}
                                 >
                                   1. List
@@ -688,9 +737,12 @@ function Notes() {
                                       .run()
                                   }
                                   style={{
-                                    padding: "6px 10px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: "5px",
+                                    padding:
+                                      "6px 10px",
+                                    border:
+                                      "1px solid #d1d5db",
+                                    borderRadius:
+                                      "5px",
                                     background:
                                       editor.isActive(
                                         "heading",
@@ -698,7 +750,8 @@ function Notes() {
                                       )
                                         ? "#e5e7eb"
                                         : "#ffffff",
-                                    cursor: "pointer",
+                                    cursor:
+                                      "pointer",
                                   }}
                                 >
                                   H2
@@ -722,7 +775,8 @@ function Notes() {
                       <div
                         style={{
                           display: "flex",
-                          flexDirection: "column",
+                          flexDirection:
+                            "column",
                           gap: "14px",
                           marginBottom: "16px",
                         }}
@@ -740,11 +794,14 @@ function Notes() {
 
                           <textarea
                             rows={4}
-                            value={soapData.subjective}
+                            value={
+                              soapData.subjective
+                            }
                             onChange={(e) =>
                               setSoapData({
                                 ...soapData,
-                                subjective: e.target.value,
+                                subjective:
+                                  e.target.value,
                               })
                             }
                             placeholder="Client's reported symptoms, concerns and experiences..."
@@ -752,8 +809,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -772,11 +831,14 @@ function Notes() {
 
                           <textarea
                             rows={4}
-                            value={soapData.objective}
+                            value={
+                              soapData.objective
+                            }
                             onChange={(e) =>
                               setSoapData({
                                 ...soapData,
-                                objective: e.target.value,
+                                objective:
+                                  e.target.value,
                               })
                             }
                             placeholder="Observable information and clinical observations..."
@@ -784,8 +846,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -804,11 +868,14 @@ function Notes() {
 
                           <textarea
                             rows={4}
-                            value={soapData.assessment}
+                            value={
+                              soapData.assessment
+                            }
                             onChange={(e) =>
                               setSoapData({
                                 ...soapData,
-                                assessment: e.target.value,
+                                assessment:
+                                  e.target.value,
                               })
                             }
                             placeholder="Clinical assessment..."
@@ -816,8 +883,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -848,8 +917,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -861,7 +932,8 @@ function Notes() {
                       <div
                         style={{
                           display: "flex",
-                          flexDirection: "column",
+                          flexDirection:
+                            "column",
                           gap: "14px",
                           marginBottom: "16px",
                         }}
@@ -891,8 +963,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -911,11 +985,14 @@ function Notes() {
 
                           <textarea
                             rows={5}
-                            value={dapData.assessment}
+                            value={
+                              dapData.assessment
+                            }
                             onChange={(e) =>
                               setDapData({
                                 ...dapData,
-                                assessment: e.target.value,
+                                assessment:
+                                  e.target.value,
                               })
                             }
                             placeholder="Clinical interpretation and assessment..."
@@ -923,8 +1000,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -955,8 +1034,10 @@ function Notes() {
                               width: "100%",
                               padding: "12px",
                               borderRadius: "7px",
-                              border: "1px solid #d1d5db",
-                              boxSizing: "border-box",
+                              border:
+                                "1px solid #d1d5db",
+                              boxSizing:
+                                "border-box",
                               resize: "vertical",
                             }}
                           />
@@ -994,7 +1075,8 @@ function Notes() {
                     background: "#ffffff",
                     borderRadius: "12px",
                     padding: "24px",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+                    boxShadow:
+                      "0 2px 10px rgba(0,0,0,0.06)",
                   }}
                 >
                   <h2
@@ -1021,7 +1103,8 @@ function Notes() {
                     <div
                       style={{
                         display: "flex",
-                        flexDirection: "column",
+                        flexDirection:
+                          "column",
                         gap: "14px",
                       }}
                     >
@@ -1029,7 +1112,8 @@ function Notes() {
                         <div
                           key={note._id}
                           style={{
-                            border: "1px solid #e5e7eb",
+                            border:
+                              "1px solid #e5e7eb",
                             borderRadius: "9px",
                             padding: "16px",
                           }}
@@ -1037,10 +1121,13 @@ function Notes() {
                           <div
                             style={{
                               display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
+                              justifyContent:
+                                "space-between",
+                              alignItems:
+                                "center",
                               gap: "12px",
-                              marginBottom: "8px",
+                              marginBottom:
+                                "8px",
                             }}
                           >
                             <h3
@@ -1055,20 +1142,26 @@ function Notes() {
                             <span
                               style={{
                                 padding: "5px 9px",
-                                borderRadius: "20px",
-                                fontSize: "12px",
-                                fontWeight: "600",
+                                borderRadius:
+                                  "20px",
+                                fontSize:
+                                  "12px",
+                                fontWeight:
+                                  "600",
                                 background:
-                                  note.type === "shared"
+                                  note.type ===
+                                  "shared"
                                     ? "#dcfce7"
                                     : "#fee2e2",
                                 color:
-                                  note.type === "shared"
+                                  note.type ===
+                                  "shared"
                                     ? "#166534"
                                     : "#991b1b",
                               }}
                             >
-                              {note.type === "shared"
+                              {note.type ===
+                              "shared"
                                 ? "Shared"
                                 : "Private"}
                             </span>
@@ -1078,78 +1171,113 @@ function Notes() {
                             style={{
                               fontSize: "13px",
                               color: "#6b7280",
-                              marginBottom: "12px",
+                              marginBottom:
+                                "12px",
                             }}
                           >
                             {note.template} •{" "}
-                            {formatDate(note.createdAt)}
+                            {formatDate(
+                              note.createdAt
+                            )}
                           </div>
 
-                          {note.template === "freeform" && (
+                          {note.template ===
+                            "freeform" && (
                             <div
                               style={{
                                 color: "#374151",
                                 lineHeight: "1.6",
                               }}
                               dangerouslySetInnerHTML={{
-                                __html: note.content || "",
+                                __html:
+                                  note.content ||
+                                  "",
                               }}
                             />
                           )}
 
-                          {note.template === "SOAP" && (
+                          {note.template ===
+                            "SOAP" && (
                             <div
                               style={{
                                 display: "flex",
-                                flexDirection: "column",
+                                flexDirection:
+                                  "column",
                                 gap: "8px",
                                 color: "#374151",
                               }}
                             >
                               <div>
-                                <strong>Subjective:</strong>{" "}
-                                {note.soapData?.subjective || "—"}
+                                <strong>
+                                  Subjective:
+                                </strong>{" "}
+                                {note.soapData
+                                  ?.subjective ||
+                                  "—"}
                               </div>
 
                               <div>
-                                <strong>Objective:</strong>{" "}
-                                {note.soapData?.objective || "—"}
+                                <strong>
+                                  Objective:
+                                </strong>{" "}
+                                {note.soapData
+                                  ?.objective ||
+                                  "—"}
                               </div>
 
                               <div>
-                                <strong>Assessment:</strong>{" "}
-                                {note.soapData?.assessment || "—"}
+                                <strong>
+                                  Assessment:
+                                </strong>{" "}
+                                {note.soapData
+                                  ?.assessment ||
+                                  "—"}
                               </div>
 
                               <div>
-                                <strong>Plan:</strong>{" "}
-                                {note.soapData?.plan || "—"}
+                                <strong>
+                                  Plan:
+                                </strong>{" "}
+                                {note.soapData
+                                  ?.plan || "—"}
                               </div>
                             </div>
                           )}
 
-                          {note.template === "DAP" && (
+                          {note.template ===
+                            "DAP" && (
                             <div
                               style={{
                                 display: "flex",
-                                flexDirection: "column",
+                                flexDirection:
+                                  "column",
                                 gap: "8px",
                                 color: "#374151",
                               }}
                             >
                               <div>
-                                <strong>Data:</strong>{" "}
-                                {note.dapData?.data || "—"}
+                                <strong>
+                                  Data:
+                                </strong>{" "}
+                                {note.dapData
+                                  ?.data || "—"}
                               </div>
 
                               <div>
-                                <strong>Assessment:</strong>{" "}
-                                {note.dapData?.assessment || "—"}
+                                <strong>
+                                  Assessment:
+                                </strong>{" "}
+                                {note.dapData
+                                  ?.assessment ||
+                                  "—"}
                               </div>
 
                               <div>
-                                <strong>Plan:</strong>{" "}
-                                {note.dapData?.plan || "—"}
+                                <strong>
+                                  Plan:
+                                </strong>{" "}
+                                {note.dapData
+                                  ?.plan || "—"}
                               </div>
                             </div>
                           )}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import "./TherapistPublicProfile.css";
 
 function TherapistPublicProfile() {
@@ -14,8 +14,8 @@ function TherapistPublicProfile() {
   useEffect(() => {
     const fetchTherapist = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/therapists/public/${slug}`
+        const response = await axiosInstance.get(
+          `/therapists/public/${slug}`
         );
 
         setTherapist(response.data.therapist);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import "./Auth.css";
 
 function Login() {
@@ -13,8 +13,8 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/therapists/login",
+      const response = await axiosInstance.post(
+        "/therapists/login",
         {
           email,
           password,
@@ -23,7 +23,11 @@ function Login() {
 
       alert(response.data.message);
 
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem(
+        "token",
+        response.data.token
+      );
+
       localStorage.setItem(
         "therapist",
         JSON.stringify(response.data.therapist)
@@ -49,32 +53,43 @@ function Login() {
 
         <form onSubmit={handleSubmit}>
           <div className="auth-form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">
+              Email Address
+            </label>
 
             <input
               id="email"
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
               required
             />
           </div>
 
           <div className="auth-form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              Password
+            </label>
 
             <input
               id="password"
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               required
             />
           </div>
 
-          <button type="submit" className="auth-button">
+          <button
+            type="submit"
+            className="auth-button"
+          >
             Login
           </button>
         </form>

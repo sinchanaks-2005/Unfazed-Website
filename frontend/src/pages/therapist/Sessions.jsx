@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import ChatWindow from "../../components/ChatWindow";
-import "./Sessions.css";
 
-const API_BASE_URL = "http://localhost:5000/api";
+import axiosInstance from "../../api/axiosInstance";
+
+import ChatWindow from "../../components/ChatWindow";
+
+import "./Sessions.css";
 
 function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -31,17 +32,11 @@ function Sessions() {
         .replace(/-/g, "+")
         .replace(/_/g, "/");
 
-      const decoded = JSON.parse(
-        atob(normalizedPayload)
-      );
+      const decoded = JSON.parse(atob(normalizedPayload));
 
       return decoded.therapistId || null;
     } catch (error) {
-      console.error(
-        "Unable to read therapist ID:",
-        error
-      );
-
+      console.error("Unable to read therapist ID:", error);
       return null;
     }
   };
@@ -58,8 +53,8 @@ function Sessions() {
         return;
       }
 
-      const response = await axios.get(
-        `${API_BASE_URL}/scheduling/sessions`,
+      const response = await axiosInstance.get(
+        "/scheduling/sessions",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -69,10 +64,7 @@ function Sessions() {
 
       setSessions(response.data.sessions || []);
     } catch (err) {
-      console.error(
-        "Failed to fetch sessions:",
-        err
-      );
+      console.error("Failed to fetch sessions:", err);
 
       setError(
         err.response?.data?.message ||
