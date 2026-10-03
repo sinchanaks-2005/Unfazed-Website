@@ -13,6 +13,7 @@ import Notes from "./pages/therapist/Notes";
 
 import TherapistPublicProfile from "./pages/client/TherapistPublicProfile";
 import BookingPage from "./pages/client/BookingPage";
+import ClientChat from "./pages/client/ClientChat";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -56,6 +57,12 @@ function App() {
       <Route
         path="/:slug"
         element={<TherapistPublicProfile />}
+      />
+
+      {/* Client Chat */}
+      <Route
+        path="/client/chat"
+        element={<ClientChat />}
       />
 
       {/* Protected Therapist Pages */}

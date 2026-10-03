@@ -7,17 +7,25 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 
 const connectDB = require("./src/config/db");
+
 const therapistRoutes = require("./src/routes/therapistRoutes");
 const schedulingRoutes = require("./src/routes/schedulingRoutes");
 const clientRoutes = require("./src/routes/clientRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
 const noteRoutes = require("./src/routes/noteRoutes");
 const analyticsRoutes = require("./src/routes/analyticsRoutes");
+const chatRoutes = require("./src/routes/chatRoutes");
 
 const errorHandler = require("./src/middleware/errorHandler");
+
 const {
   seedDefaultTiersIfEmpty,
 } = require("./src/services/entitlementService");
+
+const {
+  startNotificationScheduler,
+} = require("./src/services/notificationScheduler");
+
 const initChatSocket = require("./src/sockets/chatSocket");
 
 const app = express();
@@ -49,12 +57,17 @@ app.use(
 // Serve static invoice PDFs
 app.use(
   "/invoices",
-  express.static(path.join(__dirname, "public/invoices"))
+  express.static(
+    path.join(__dirname, "public/invoices")
+  )
 );
 
 // Connect DB and seed tier configs
 connectDB().then(() => {
   seedDefaultTiersIfEmpty();
+
+  // Module 6 notification scheduler
+  startNotificationScheduler();
 });
 
 app.get("/", (req, res) => {
@@ -66,12 +79,41 @@ app.get("/", (req, res) => {
 });
 
 // Mount modular routes
-app.use("/api/therapists", therapistRoutes);
-app.use("/api/scheduling", schedulingRoutes);
-app.use("/api/clients", clientRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/notes", noteRoutes);
-app.use("/api/analytics", analyticsRoutes);
+app.use(
+  "/api/therapists",
+  therapistRoutes
+);
+
+app.use(
+  "/api/scheduling",
+  schedulingRoutes
+);
+
+app.use(
+  "/api/clients",
+  clientRoutes
+);
+
+app.use(
+  "/api/payments",
+  paymentRoutes
+);
+
+app.use(
+  "/api/notes",
+  noteRoutes
+);
+
+app.use(
+  "/api/analytics",
+  analyticsRoutes
+);
+
+// Module 6 chat history API
+app.use(
+  "/api/chat",
+  chatRoutes
+);
 
 // Central error handler
 app.use(errorHandler);
@@ -79,5 +121,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`UNFAZED Server running on port ${PORT}`);
+  console.log(
+    `UNFAZED Server running on port ${PORT}`
+  );
 });

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import ChatWindow from "../../components/ChatWindow";
 import "./Sessions.css";
 
 const API_BASE_URL = "http://localhost:5000/api";
@@ -10,8 +11,42 @@ function Sessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [chatOpen, setChatOpen] = useState(false);
 
   const token = localStorage.getItem("token");
+
+  const getTherapistIdFromToken = () => {
+    try {
+      if (!token) {
+        return null;
+      }
+
+      const payload = token.split(".")[1];
+
+      if (!payload) {
+        return null;
+      }
+
+      const normalizedPayload = payload
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+      const decoded = JSON.parse(
+        atob(normalizedPayload)
+      );
+
+      return decoded.therapistId || null;
+    } catch (error) {
+      console.error(
+        "Unable to read therapist ID:",
+        error
+      );
+
+      return null;
+    }
+  };
+
+  const therapistId = getTherapistIdFromToken();
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -34,7 +69,10 @@ function Sessions() {
 
       setSessions(response.data.sessions || []);
     } catch (err) {
-      console.error("Failed to fetch sessions:", err);
+      console.error(
+        "Failed to fetch sessions:",
+        err
+      );
 
       setError(
         err.response?.data?.message ||
@@ -49,15 +87,6 @@ function Sessions() {
     fetchSessions();
   }, [fetchSessions]);
 
-  /*
-   * REAL DATE/TIME LOGIC
-   *
-   * A session is considered upcoming when its END time
-   * is still in the future.
-   *
-   * A session is considered past when its END time
-   * has already passed.
-   */
   const upcomingSessions = useMemo(() => {
     const now = new Date();
 
@@ -73,7 +102,8 @@ function Sessions() {
       })
       .sort(
         (a, b) =>
-          new Date(a.startTime) - new Date(b.startTime)
+          new Date(a.startTime) -
+          new Date(b.startTime)
       );
   }, [sessions]);
 
@@ -92,13 +122,11 @@ function Sessions() {
       })
       .sort(
         (a, b) =>
-          new Date(b.startTime) - new Date(a.startTime)
+          new Date(b.startTime) -
+          new Date(a.startTime)
       );
   }, [sessions]);
 
-  /*
-   * REAL COUNTS
-   */
   const upcomingCount = upcomingSessions.length;
 
   const completedCount = pastSessions.filter(
@@ -107,43 +135,37 @@ function Sessions() {
 
   const totalCount = sessions.length;
 
-  /*
-   * CURRENT TAB DATA
-   */
   const filteredSessions =
     activeTab === "upcoming"
       ? upcomingSessions
       : pastSessions;
 
-  /*
-   * DATE FORMAT
-   */
   const formatDate = (dateString) => {
     if (!dateString) return "—";
 
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(dateString).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
-  /*
-   * TIME FORMAT
-   */
   const formatTime = (dateString) => {
     if (!dateString) return "—";
 
-    return new Date(dateString).toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    return new Date(dateString).toLocaleTimeString(
+      "en-IN",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }
+    );
   };
 
-  /*
-   * STATUS
-   */
   const getStatusClass = (session) => {
     if (session.status === "cancelled") {
       return "status-cancelled";
@@ -180,6 +202,14 @@ function Sessions() {
     }
 
     return "Booked";
+  };
+
+  const handleOpenChat = () => {
+    setChatOpen(true);
+  };
+
+  const handleCloseChat = () => {
+    setChatOpen(false);
   };
 
   if (loading) {
@@ -369,7 +399,10 @@ function Sessions() {
       {selectedSession && (
         <div
           className="session-modal-overlay"
-          onClick={() => setSelectedSession(null)}
+          onClick={() => {
+            setSelectedSession(null);
+            setChatOpen(false);
+          }}
         >
           <div
             className="session-modal"
@@ -391,9 +424,10 @@ function Sessions() {
               <button
                 type="button"
                 className="session-modal-close"
-                onClick={() =>
-                  setSelectedSession(null)
-                }
+                onClick={() => {
+                  setSelectedSession(null);
+                  setChatOpen(false);
+                }}
               >
                 ×
               </button>
@@ -480,14 +514,107 @@ function Sessions() {
                   </p>
                 </div>
               )}
+
+              {/* MODULE 6 CHAT */}
+              {!chatOpen && (
+                <div
+                  style={{
+                    marginTop: "20px",
+                    paddingTop: "16px",
+                    borderTop: "1px solid #e5e7eb",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleOpenChat}
+                    disabled={
+                      !selectedSession.client?._id ||
+                      !therapistId
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor:
+                        selectedSession.client?._id &&
+                        therapistId
+                          ? "pointer"
+                          : "not-allowed",
+                      background:
+                        selectedSession.client?._id &&
+                        therapistId
+                          ? "#2563eb"
+                          : "#9ca3af",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Open Chat
+                  </button>
+                </div>
+              )}
+
+              {chatOpen &&
+                selectedSession.client?._id &&
+                therapistId && (
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      paddingTop: "16px",
+                      borderTop: "1px solid #e5e7eb",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent:
+                          "space-between",
+                        alignItems: "center",
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <strong>
+                        Chat with{" "}
+                        {selectedSession.clientName ||
+                          "Client"}
+                      </strong>
+
+                      <button
+                        type="button"
+                        onClick={handleCloseChat}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Close Chat
+                      </button>
+                    </div>
+
+                    <ChatWindow
+                      roomId={`${therapistId}_${selectedSession.client._id}`}
+                      therapistId={therapistId}
+                      clientId={
+                        selectedSession.client._id
+                      }
+                      userId={therapistId}
+                      userName="Therapist"
+                      userRole="therapist"
+                    />
+                  </div>
+                )}
             </div>
 
             <div className="session-modal-footer">
               <button
                 type="button"
-                onClick={() =>
-                  setSelectedSession(null)
-                }
+                onClick={() => {
+                  setSelectedSession(null);
+                  setChatOpen(false);
+                }}
               >
                 Close
               </button>
