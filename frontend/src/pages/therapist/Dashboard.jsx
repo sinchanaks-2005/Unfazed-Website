@@ -47,6 +47,7 @@ function Dashboard() {
       );
 
       const allSessions = sessionsRes.data.sessions || [];
+
       const now = new Date();
 
       const upcoming = allSessions.filter(
@@ -147,8 +148,10 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page">
+
       {/* Sidebar */}
       <aside className="dashboard-sidebar">
+
         <div className="dashboard-logo">
           <span>U</span>
 
@@ -159,6 +162,7 @@ function Dashboard() {
         </div>
 
         <nav className="dashboard-nav">
+
           <button
             className="nav-item active"
             onClick={() =>
@@ -209,6 +213,28 @@ function Dashboard() {
             Availability
           </button>
 
+          {/* Module 4 - Packages */}
+          <button
+            className="nav-item"
+            onClick={() =>
+              navigate("/therapist/packages")
+            }
+          >
+            <span>▤</span>
+            Packages
+          </button>
+
+          {/* Module 5 - Clinical Notes */}
+          <button
+            className="nav-item"
+            onClick={() =>
+              navigate("/therapist/notes")
+            }
+          >
+            <span>✎</span>
+            Clinical Notes
+          </button>
+
           <button
             className="nav-item"
             onClick={() =>
@@ -218,6 +244,7 @@ function Dashboard() {
             <span>⚙</span>
             Settings
           </button>
+
         </nav>
 
         <button
@@ -227,12 +254,15 @@ function Dashboard() {
           <span>↪</span>
           Logout
         </button>
+
       </aside>
 
       {/* Main Content */}
       <main className="dashboard-main">
+
         {/* Header */}
         <header className="dashboard-header">
+
           <div>
             <p className="welcome-small">
               THERAPIST DASHBOARD
@@ -252,6 +282,7 @@ function Dashboard() {
           </div>
 
           <div className="profile-mini">
+
             <div className="profile-avatar">
               {therapist.name
                 ?.charAt(0)
@@ -262,18 +293,24 @@ function Dashboard() {
               <strong>
                 {therapist.name || "Therapist"}
               </strong>
+
               <span>Therapist</span>
             </div>
+
           </div>
+
         </header>
 
         {/* Statistics */}
         <section className="stats-grid">
+
           <div className="stat-card">
+
             <div className="stat-icon">♙</div>
 
             <div>
               <p>Total Clients</p>
+
               <h2>
                 {statVal(stats.totalClients)}
               </h2>
@@ -282,9 +319,11 @@ function Dashboard() {
                 Unique bookers
               </span>
             </div>
+
           </div>
 
           <div className="stat-card">
+
             <div className="stat-icon">▣</div>
 
             <div>
@@ -298,9 +337,11 @@ function Dashboard() {
                 Scheduled ahead
               </span>
             </div>
+
           </div>
 
           <div className="stat-card">
+
             <div className="stat-icon">◷</div>
 
             <div>
@@ -314,9 +355,11 @@ function Dashboard() {
                 Sessions done
               </span>
             </div>
+
           </div>
 
           <div className="stat-card">
+
             <div className="stat-icon">★</div>
 
             <div>
@@ -331,14 +374,19 @@ function Dashboard() {
 
               <span>All time</span>
             </div>
+
           </div>
+
         </section>
 
         {/* Dashboard Content */}
         <section className="dashboard-content">
+
           {/* Upcoming Sessions */}
           <div className="dashboard-card sessions-card">
+
             <div className="card-heading">
+
               <div>
                 <h2>Upcoming Sessions</h2>
 
@@ -355,10 +403,13 @@ function Dashboard() {
               >
                 View all
               </button>
+
             </div>
 
             <div className="session-list">
+
               {statsLoading ? (
+
                 <div
                   style={{
                     padding: "20px",
@@ -368,7 +419,9 @@ function Dashboard() {
                 >
                   Loading sessions...
                 </div>
+
               ) : recentSessions.length === 0 ? (
+
                 <div
                   style={{
                     padding: "20px",
@@ -376,6 +429,7 @@ function Dashboard() {
                     textAlign: "center",
                   }}
                 >
+
                   <div
                     style={{
                       fontSize: "24px",
@@ -393,13 +447,18 @@ function Dashboard() {
                     Sessions will appear here once
                     clients book appointments.
                   </small>
+
                 </div>
+
               ) : (
+
                 recentSessions.map((session) => (
+
                   <div
                     className="session-item"
                     key={session._id}
                   >
+
                     <div className="client-avatar">
                       {(session.clientName || "?")
                         .charAt(0)
@@ -407,6 +466,7 @@ function Dashboard() {
                     </div>
 
                     <div className="session-info">
+
                       <strong>
                         {session.clientName ||
                           "Unknown"}
@@ -415,9 +475,11 @@ function Dashboard() {
                       <span>
                         {session.clientEmail || "—"}
                       </span>
+
                     </div>
 
                     <div className="session-time">
+
                       <strong>
                         {formatTime(
                           session.startTime
@@ -429,20 +491,27 @@ function Dashboard() {
                           session.startTime
                         )}
                       </span>
+
                     </div>
 
                     <span className="session-status">
                       Upcoming
                     </span>
+
                   </div>
+
                 ))
               )}
+
             </div>
+
           </div>
 
           {/* Profile Card */}
           <div className="dashboard-card profile-card">
+
             <div className="profile-card-top">
+
               <div className="large-avatar">
                 {therapist.name
                   ?.charAt(0)
@@ -456,20 +525,24 @@ function Dashboard() {
 
                 <p>Therapist</p>
               </div>
+
             </div>
 
             <div className="profile-divider"></div>
 
             <div className="profile-detail">
+
               <span>Public Profile</span>
 
               <strong>
                 unfazed.com/therapist/
                 {therapist.slug || "your-profile"}
               </strong>
+
             </div>
 
             <div className="profile-actions">
+
               <button
                 className="profile-button"
                 onClick={() =>
@@ -485,13 +558,18 @@ function Dashboard() {
               >
                 View Public Profile
               </button>
+
             </div>
+
           </div>
+
         </section>
 
         {/* Banner */}
         <section className="dashboard-banner">
+
           <div>
+
             <p>YOUR PRACTICE, YOUR SPACE</p>
 
             <h2>
@@ -503,13 +581,17 @@ function Dashboard() {
               Manage your profile, sessions and
               clients from one place.
             </span>
+
           </div>
 
           <div className="banner-symbol">
             ✦
           </div>
+
         </section>
+
       </main>
+
     </div>
   );
 }

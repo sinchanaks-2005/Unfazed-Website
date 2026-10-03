@@ -8,6 +8,8 @@ import Sessions from "./pages/therapist/Sessions";
 import Clients from "./pages/therapist/Clients";
 import Availability from "./pages/therapist/Availability";
 import Settings from "./pages/therapist/Settings";
+import Packages from "./pages/therapist/Packages";
+import Notes from "./pages/therapist/Notes";
 
 import TherapistPublicProfile from "./pages/client/TherapistPublicProfile";
 import BookingPage from "./pages/client/BookingPage";
@@ -107,6 +109,25 @@ function App() {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/therapist/packages"
+        element={
+          <ProtectedRoute>
+            <Packages />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Clinical Notes */}
+      <Route
+        path="/therapist/notes"
+        element={
+          <ProtectedRoute>
+            <Notes />
           </ProtectedRoute>
         }
       />

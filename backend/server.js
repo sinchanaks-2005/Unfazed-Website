@@ -15,7 +15,9 @@ const noteRoutes = require("./src/routes/noteRoutes");
 const analyticsRoutes = require("./src/routes/analyticsRoutes");
 
 const errorHandler = require("./src/middleware/errorHandler");
-const { seedDefaultTiersIfEmpty } = require("./src/services/entitlementService");
+const {
+  seedDefaultTiersIfEmpty,
+} = require("./src/services/entitlementService");
 const initChatSocket = require("./src/sockets/chatSocket");
 
 const app = express();
@@ -32,10 +34,23 @@ const io = new Server(server, {
 initChatSocket(io);
 
 app.use(cors());
-app.use(express.json());
+
+// Preserve the original request body for Razorpay webhook verification
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      if (req.originalUrl === "/api/payments/webhook") {
+        req.rawBody = Buffer.from(buf);
+      }
+    },
+  })
+);
 
 // Serve static invoice PDFs
-app.use("/invoices", express.static(path.join(__dirname, "public/invoices")));
+app.use(
+  "/invoices",
+  express.static(path.join(__dirname, "public/invoices"))
+);
 
 // Connect DB and seed tier configs
 connectDB().then(() => {
