@@ -235,6 +235,17 @@ function Dashboard() {
             Clinical Notes
           </button>
 
+          {/* Module 7 - Analytics */}
+          <button
+            className="nav-item"
+            onClick={() =>
+              navigate("/therapist/analytics")
+            }
+          >
+            <span>◈</span>
+            Analytics
+          </button>
+
           <button
             className="nav-item"
             onClick={() =>

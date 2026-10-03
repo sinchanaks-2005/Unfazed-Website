@@ -10,6 +10,7 @@ import Availability from "./pages/therapist/Availability";
 import Settings from "./pages/therapist/Settings";
 import Packages from "./pages/therapist/Packages";
 import Notes from "./pages/therapist/Notes";
+import Analytics from "./pages/therapist/Analytics";
 
 import TherapistPublicProfile from "./pages/client/TherapistPublicProfile";
 import BookingPage from "./pages/client/BookingPage";
@@ -135,6 +136,16 @@ function App() {
         element={
           <ProtectedRoute>
             <Notes />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Analytics */}
+      <Route
+        path="/therapist/analytics"
+        element={
+          <ProtectedRoute>
+            <Analytics />
           </ProtectedRoute>
         }
       />
